@@ -49,24 +49,28 @@ console.log (renderType) ;
 
 $(document).ready (function() {
 
-  //cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
+  /*
+  cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
+  startup() ;
+  */
 
-  wireframeEngine.readWavefrontObj ('assets/objects/player2.obj', function (modelDef) {
-    cubeModel = wireframeEngine.setupModel (modelDef) ;
-    //cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
+  $.get ('assets/objects/player2.obj', function (data) {
+    var cubeModelDef = wireframeEngine.parseWavefrontObj (data) ;
 
-    //console.log (JSON.stringify(cubeModel, 2, 2)) ;
+    cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
+
+    //cubeModel.clipToViewport = false ;
 
     startup() ;
   }) ;
 
-  //startup() ;
+
 }) ;
 
 
 function startup() {
 
-  wireframeEngine.viewAsPerspective (cubeModel, 90, canvas.w, canvas.h, 1, 100) ;
+  wireframeEngine.viewAsPerspective (cubeModel, 90, 50, 50, canvas.w - 50, canvas.h - 50, 1, 100) ;
 
   var modelGraphics = new PIXI.Graphics() ;
 
@@ -150,16 +154,17 @@ function startup() {
   pixelEffectContainer.addChild (renderSpriteBlur) ;
 
   var pixelFilter = new PIXI.filters.PixelateFilter() ;
-  pixelFilter.size = { x: 2, y: 2 } ;
+  pixelFilter.size = { x: 1, y: 1 } ;
   pixelEffectContainer.filters = [pixelFilter] ;
 
   var animTick = 0 ;
   var blurScale = 0.9 ;
-  var lineThickness = 4 ;
+  var lineThickness = 1 ;
 
   var guitheme;
 
-  var modelPos = new THREE.Vector3(0, 0, 0.35) ;
+  var modelPos = new THREE.Vector3(0, 0, -7.0) ;
+  var modelRot = new THREE.Vector3(90, 0.01, 0.01) ;
 
   function onCompleteThemeLoad() {
     // initialize theme
@@ -202,7 +207,7 @@ function startup() {
     sliderGlow.minimum = 0.0 ;
     sliderGlow.maximum = 1 ;
     sliderGlow.value = 1 ;
-    uiGroup.addChild(sliderGlow);
+    //uiGroup.addChild(sliderGlow);
 
     var sliderGlowFactorMax = new GOWN.Slider(null, guitheme);
     sliderGlowFactorMax.width = 300;
@@ -210,7 +215,7 @@ function startup() {
     sliderGlowFactorMax.minimum = 0.5 ;
     sliderGlowFactorMax.maximum = 4 ;
     sliderGlowFactorMax.value = glowFilter.factorMax ;
-    uiGroup.addChild(sliderGlowFactorMax);
+    //uiGroup.addChild(sliderGlowFactorMax);
 
 
     var sliderGlowSumBias = new GOWN.Slider(null, guitheme);
@@ -219,7 +224,7 @@ function startup() {
     sliderGlowSumBias.minimum = 0.01 ;
     sliderGlowSumBias.maximum = 0.05 ;
     sliderGlowSumBias.value = glowFilter.sumBias ;
-    uiGroup.addChild(sliderGlowSumBias);
+    //uiGroup.addChild(sliderGlowSumBias);
 
 
     var sliderPixels = new GOWN.Slider(null, guitheme);
@@ -228,7 +233,7 @@ function startup() {
     sliderPixels.minimum = 1 ;
     sliderPixels.maximum = 30 ;
     sliderPixels.value = pixelFilter.size.x ;
-    uiGroup.addChild(sliderPixels);
+    //uiGroup.addChild(sliderPixels);
 
     var sliderLineThickness = new GOWN.Slider(null, guitheme);
     sliderLineThickness.width = 300;
@@ -236,7 +241,7 @@ function startup() {
     sliderLineThickness.minimum = 1 ;
     sliderLineThickness.maximum = 30 ;
     sliderLineThickness.value = lineThickness ;
-    uiGroup.addChild(sliderLineThickness);
+    //uiGroup.addChild(sliderLineThickness);
 
     var sliderX = new GOWN.Slider(null, guitheme);
     sliderX.width = 300;
@@ -262,25 +267,75 @@ function startup() {
     sliderZ.value = modelPos.z ;
     //uiGroup.addChild(sliderZ);
 
+    var sliderRotX = new GOWN.Slider(null, guitheme);
+    sliderRotX.width = 300;
+    sliderRotX.height = 40 ;
+    sliderRotX.minimum = -180 ;
+    sliderRotX.maximum = 180 ;
+    sliderRotX.value = modelRot.x ;
+    uiGroup.addChild(sliderRotX);
+
+    var sliderRotY = new GOWN.Slider(null, guitheme);
+    sliderRotY.width = 300;
+    sliderRotY.height = 40 ;
+    sliderRotY.minimum = -180 ;
+    sliderRotY.maximum = 180 ;
+    sliderRotY.value = modelRot.y ;
+    uiGroup.addChild(sliderRotY);
+
+    var sliderRotZ = new GOWN.Slider(null, guitheme);
+    sliderRotZ.width = 300;
+    sliderRotZ.height = 40 ;
+    sliderRotZ.minimum = -180 ;
+    sliderRotZ.maximum = 180 ;
+    sliderRotZ.value = modelRot.z ;
+    uiGroup.addChild(sliderRotZ);
+
+    var sliderClip = new GOWN.Slider(null, guitheme);
+    sliderClip.width = 300;
+    sliderClip.height = 40 ;
+    sliderClip.minimum = 0.01 ;
+    sliderClip.maximum = 10 ;
+    sliderClip.value = 1.0 ;
+    uiGroup.addChild(sliderClip);
+
 
     var chkBlur;
     chkBlur = new GOWN.CheckBox(true, guitheme);
     chkBlur.width = 30 ;
     chkBlur.height = 30 ;
-    uiGroup.addChild(chkBlur) ;
+    //uiGroup.addChild(chkBlur) ;
 
     var chkGlow;
     chkGlow = new GOWN.CheckBox(true, guitheme);
     chkGlow.width = 30 ;
     chkGlow.height = 30 ;
-    uiGroup.addChild(chkGlow) ;
+    //uiGroup.addChild(chkGlow) ;
 
+
+    var chkClipView;
+    chkClipView = new GOWN.CheckBox(true, guitheme);
+    chkClipView.width = 30 ;
+    chkClipView.height = 30 ;
+    uiGroup.addChild(chkClipView) ;
+
+    var chkClipFru;
+    chkClipFru = new GOWN.CheckBox(true, guitheme);
+    chkClipFru.width = 30 ;
+    chkClipFru.height = 30 ;
+    uiGroup.addChild(chkClipFru) ;
 
     chkBlur.change = function(selected) {
       renderSpriteBlur.visible = selected ;
     };
     chkGlow.change = function(selected) {
       renderSpriteGlow.visible = selected ;
+    };
+    chkClipView.change = function(selected) {
+      cubeModel.clipToViewport = selected ;
+    };
+    chkClipFru.change = function(selected) {
+      cubeModel.clipToFrustrum = selected ;
     };
 
     slider.change = function(sliderData) {
@@ -314,6 +369,19 @@ function startup() {
     sliderZ.change = function(sliderData) {
       modelPos.z = sliderData.value ;
     };
+    sliderRotX.change = function(sliderData) {
+      modelRot.x = sliderData.value ;
+    };
+    sliderRotY.change = function(sliderData) {
+      modelRot.y = sliderData.value ;
+    };
+    sliderRotZ.change = function(sliderData) {
+      modelRot.z = sliderData.value ;
+    };
+    sliderClip.change = function(sliderData) {
+      wireframeEngine.viewAsPerspective (cubeModel, 90, 50, 50, canvas.w - 50, canvas.h - 50, sliderData.value, 100) ;
+    };
+
 
 
     requestAnimationFrame(animate);
@@ -326,6 +394,7 @@ function startup() {
         ["gown.js/themes/assets/metalworks/metalworks.json"], onCompleteThemeLoad);
 
   var moveAxisZVel = 0 ;
+  cubeModel.position.z = modelPos.z ;
 
   function animate() {
 
@@ -339,9 +408,12 @@ function startup() {
       cubeModel.position.y = modelPos.y ;
       //cubeModel.position.z = modelPos.z ;
       cubeModel.position.z += moveAxisZVel ;
-      cubeModel.rotation.x += 0.01 ;
-      cubeModel.rotation.y += 0.01 ;
-      cubeModel.rotation.z += 0.01 ;
+      //cubeModel.rotation.x += 0.01 ;
+      //cubeModel.rotation.y += 0.01 ;
+      //cubeModel.rotation.z += 0.01 ;
+      cubeModel.rotation.x = modelRot.x * 0.0174533 ;
+      cubeModel.rotation.y = modelRot.y * 0.0174533 ;
+      cubeModel.rotation.z = modelRot.z * 0.0174533 ;
       wireframeEngine.applyModelTransforms (cubeModel) ;
       wireframeEngine.generateLines (cubeModel) ;
       wireframeEngine.renderModelToGraphics (cubeModel, modelGraphics, lineThickness) ;

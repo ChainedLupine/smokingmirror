@@ -1,0 +1,28 @@
+{
+  "name": "slepinyrbuilder",
+  "description": "Stuff.",
+  "version": "0.99.0",
+  "author": "Chained Lupine",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-banner": "^0.2.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-cssmin": "^0.9.0",
+    "grunt-contrib-jade": "~0.8.0",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-less": "~0.8.2",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-newer": "^0.7.0",
+    "grunt-shell": "^0.6.4",
+    "grunt-spritesmith": "^1.25.0",
+    "jit-grunt": "^0.7.0",
+    "jshint": "^2.5.1",
+    "load-grunt-tasks": "^0.4.0",
+    "node-json-minify": "^0.1.3-a",
+    "requirejs": "^2.1.14",
+    "time-grunt": "^0.3.1"
+  }
+}
