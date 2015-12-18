@@ -1,0 +1,7 @@
+lib-cov/
+docs/
+coverage
+node_modules/
+.grunt
+test/gen/
+*.log

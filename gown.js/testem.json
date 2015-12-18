@@ -1,0 +1,13 @@
+{
+    "framework" : "mocha+chai",
+    "launch_in_dev" : ["Chrome", "Firefox"],
+    "launch_in_ci" : ["Firefox"],
+    "src_files" : [
+        "lib/pixi.js",
+        "bin/gown.js",
+        "test/setup.js",
+        "test/src/*.js",
+        "themes/*.js",
+        "test/unit/**/*.test.js"
+    ]
+}

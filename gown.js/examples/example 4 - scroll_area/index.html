@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>pixi UI example: tiled layout</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <script src="../../lib/pixi.js"></script>
+    <script src="../../bin/gown.js"></script>
+    <script src="../../themes/AeonTheme.js"></script>
+    <script src="../../themes/ShapeTheme.js"></script>
+</head>
+<body>
+<script>
+    var stage = new PIXI.Container();
+    var sizes = {w: 800, h: 600};
+    var renderer = PIXI.autoDetectRenderer(sizes.w, sizes.h, {backgroundColor : 0xffffff});
+    document.body.appendChild(renderer.view);
+
+    var grp, btn, sa_grp;
+
+    function onComplete() {
+        //stage.addChild(toggleButton);
+        var sprite = PIXI.Sprite.fromImage("img/rainbow.png");
+        var sa_sprite = new GOWN.ScrollArea(sprite);
+        sa_sprite.x = 240;
+        sa_sprite.y = 240;
+        sa_sprite.width = sa_sprite.height = 180;
+        stage.addChild(sa_sprite);
+
+        grp = new GOWN.LayoutGroup();
+        grp.layout = new GOWN.VerticalLayout();
+
+        // create layout container and add some buttons
+        for (var i = 0; i < 20; i++) {
+            btn = new GOWN.Button();
+            btn.height = 25;
+            btn.width = 100;
+            btn.label = (i+1)+". button";
+            grp.addChild(btn);
+        }
+
+        sa_grp = new GOWN.ScrollArea(grp);
+        sa_grp.x = 100;
+        sa_grp.y = 100;
+        sa_grp._useMask = false;
+        sa_grp.height = 150;
+        sa_grp.width = 150;
+
+        stage.addChild(sa_grp);
+
+        requestAnimationFrame(animate);
+    }
+
+    GOWN.loader.add("img/rainbow.png");
+    var theme = new GOWN.AeonTheme(
+            "../../themes/assets/aeon/aeon_desktop.json", onComplete);
+
+    function animate() {
+        // render the stage
+        renderer.render(stage);
+        requestAnimationFrame(animate);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+    "name": "gown.js",
+    "version": "0.0.0",
+
+    "main": "bin/gown.js",
+
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "examples",
+        "tasks"
+    ],
+    "dependencies": {
+    },
+    "devDependencies": {
+    }
+}
