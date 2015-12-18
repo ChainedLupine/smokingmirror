@@ -2,6 +2,82 @@ var THREE = {} ;
 var OUTCODES = Object.freeze ({"INSIDE": 0, "LEFT": 1, "RIGHT": 2, "BOTTOM": 4, "TOP": 8}) ;
 
 var WireframeEngine = function() {
+
+    var clip_graphics, clip_xmin, clip_ymin, clip_xmax, clip_ymax ;
+
+    var computeOutCode2D = function (x, y) {
+      var code = OUTCODES.INSIDE ;
+
+      if (x < clip_xmin) {
+        code |= OUTCODES.LEFT ;
+      } else if (x > clip_xmax) {
+        code |= OUTCODES.RIGHT ;
+      }
+      if (y < clip_ymin) {
+        code |= OUTCODES.BOTTOM ;
+      } else if (y > clip_ymax) {
+        code |= OUTCODES.TOP ;
+      }
+      return code ;
+    } ;
+
+    this.setupClip = function (graphics, xmin, ymin, xmax, ymax) {
+      clip_graphics = graphics ;
+      clip_xmin = xmin ;
+      clip_ymin = ymin ;
+      clip_xmax = xmax ;
+      clip_ymax = ymax ;
+    } ;
+
+    // Cohen-Sutherland clipping (2D)
+    this.clipAndDrawLine2D = function (x0, y0, x1, y1) {
+      var outcode0 = computeOutCode2D (x0, y0) ;
+      var outcode1 = computeOutCode2D (x1, y1) ;
+      var accept = false ;
+
+      while (true) {
+        if (!(outcode0 | outcode1)) {
+          accept = true ;
+          break ;
+        } else if (outcode0 & outcode1) {
+          break ;
+        } else {
+          var x, y ;
+
+          var outcodeOut = outcode0 ? outcode0 : outcode1 ;
+
+          if (outcodeOut & OUTCODES.TOP) {
+            x = x0 + (x1 - x0) * (clip_ymax - y0) / (y1 - y0) ;
+            y = clip_ymax ;
+          } else if (outcodeOut & OUTCODES.BOTTOM) {
+            x = x0 + (x1 - x0) * (clip_ymin - y0) / (y1 - y0) ;
+            y = clip_ymin ;
+          } else if (outcodeOut & OUTCODES.RIGHT) {
+            y = y0 + (y1 - y0) * (clip_xmax - x0) / (x1 - x0) ;
+            x = clip_xmax ;
+          } else if (outcodeOut & OUTCODES.LEFT) {
+            y = y0 + (y1 - y0) * (clip_xmin - x0) / (x1 - x0) ;
+            x = clip_xmin ;
+          }
+
+          if (outcodeOut === outcode0) {
+            x0 = x ;
+            y0 = y ;
+            outcode0 = computeOutCode2D (x0, y0) ;
+          } else {
+            x1 = x ;
+            y1 = y ;
+            outcode1 = computeOutCode2D (x1, y1) ;
+          }
+        }
+      }
+      if (accept) {
+        clip_graphics.moveTo (x0, y0) ;
+        clip_graphics.lineTo (x1, y1) ;
+      }
+    } ;
+
+
 };
 
 WireframeEngine.prototype = {
@@ -197,73 +273,7 @@ WireframeEngine.prototype = {
 
     var lastVert = THREE.Vector3() ;
 
-    var xmin = model.viewX, ymin = model.viewY, xmax = model.viewWidth, ymax = model.viewHeight ;
-    var zmin = 0, zmax
-
-    // now do Cohen-Sutherland clipping (2D)
-    var computeOutCode2D = function (x, y) {
-      var code = OUTCODES.INSIDE ;
-
-      if (x < xmin) {
-        code |= OUTCODES.LEFT ;
-      } else if (x > xmax) {
-        code |= OUTCODES.RIGHT ;
-      }
-      if (y < ymin) {
-        code |= OUTCODES.BOTTOM ;
-      } else if (y > ymax) {
-        code |= OUTCODES.TOP ;
-      }
-      return code ;
-    } ;
-
-    var clipAndDrawLine2D = function (x0, y0, x1, y1) {
-      var outcode0 = computeOutCode2D (x0, y0) ;
-      var outcode1 = computeOutCode2D (x1, y1) ;
-      var accept = false ;
-
-      while (true) {
-        if (!(outcode0 | outcode1)) {
-          accept = true ;
-          break ;
-        } else if (outcode0 & outcode1) {
-          break ;
-        } else {
-          var x, y ;
-
-          var outcodeOut = outcode0 ? outcode0 : outcode1 ;
-
-          if (outcodeOut & OUTCODES.TOP) {
-            x = x0 + (x1 - x0) * (ymax - y0) / (y1 - y0) ;
-            y = ymax ;
-          } else if (outcodeOut & OUTCODES.BOTTOM) {
-            x = x0 + (x1 - x0) * (ymin - y0) / (y1 - y0) ;
-            y = ymin ;
-          } else if (outcodeOut & OUTCODES.RIGHT) {
-            y = y0 + (y1 - y0) * (xmax - x0) / (x1 - x0) ;
-            x = xmax ;
-          } else if (outcodeOut & OUTCODES.LEFT) {
-            y = y0 + (y1 - y0) * (xmin - x0) / (x1 - x0) ;
-            x = xmin ;
-          }
-
-          if (outcodeOut === outcode0) {
-            x0 = x ;
-            y0 = y ;
-            outcode0 = computeOutCode2D (x0, y0) ;
-          } else {
-            x1 = x ;
-            y1 = y ;
-            outcode1 = computeOutCode2D (x1, y1) ;
-          }
-        }
-      }
-
-      if (accept) {
-        modelGraphics.moveTo (x0, y0) ;
-        modelGraphics.lineTo (x1, y1) ;
-      }
-    } ;
+    this.setupClip (modelGraphics, model.viewX, model.viewY, model.viewWidth, model.viewHeight) ;
 
     var near = model.near ;
     var verts = model.xformedVerts ;
@@ -334,10 +344,9 @@ WireframeEngine.prototype = {
       var px2 = vX + (x2 * vW) / w2 + vW / 2 ;
       var py2 = vY + (y2 * vH) / w2 + vH / 2 ;
 
-      // Finally, do cohen-sutherlane clipping for 2D line segment
-
+      // Finally, do cohen-sutherlane clipping for 2D line segment (if desired)
       if (clipViewport) {
-        clipAndDrawLine2D (
+        this.clipAndDrawLine2D (
           px1, py1,
           px2, py2
         ) ;

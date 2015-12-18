@@ -207,7 +207,7 @@ function startup() {
     sliderGlow.minimum = 0.0 ;
     sliderGlow.maximum = 1 ;
     sliderGlow.value = 1 ;
-    //uiGroup.addChild(sliderGlow);
+    uiGroup.addChild(sliderGlow);
 
     var sliderGlowFactorMax = new GOWN.Slider(null, guitheme);
     sliderGlowFactorMax.width = 300;
@@ -215,7 +215,7 @@ function startup() {
     sliderGlowFactorMax.minimum = 0.5 ;
     sliderGlowFactorMax.maximum = 4 ;
     sliderGlowFactorMax.value = glowFilter.factorMax ;
-    //uiGroup.addChild(sliderGlowFactorMax);
+    uiGroup.addChild(sliderGlowFactorMax);
 
 
     var sliderGlowSumBias = new GOWN.Slider(null, guitheme);
@@ -224,7 +224,7 @@ function startup() {
     sliderGlowSumBias.minimum = 0.01 ;
     sliderGlowSumBias.maximum = 0.05 ;
     sliderGlowSumBias.value = glowFilter.sumBias ;
-    //uiGroup.addChild(sliderGlowSumBias);
+    uiGroup.addChild(sliderGlowSumBias);
 
 
     var sliderPixels = new GOWN.Slider(null, guitheme);

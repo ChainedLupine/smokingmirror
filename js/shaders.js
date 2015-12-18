@@ -3,7 +3,7 @@
       var uniforms = {
         sumBias: {
           type: 'f',
-          value: 0.03
+          value: 0.041
         },
         factorMax: {
           type: 'f',
