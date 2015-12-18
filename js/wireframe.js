@@ -83,6 +83,19 @@ var WireframeEngine = function() {
 WireframeEngine.prototype = {
 
   setupModel: function (modelDef) {
+
+    var initMaterials = {} ;
+    var mats = Object.keys(modelDef.lines) ;
+
+    for (var i = 0; i < mats.length; i++) {
+      initMaterials[mats[i]] = {
+        alpha: 1.0,
+        color: 0xFFFFFF
+        //color: Math.floor(Math.random()*16777215)
+      }
+    }
+
+
     var newModel = {
       xformedVerts: [],
       def: modelDef,
@@ -93,14 +106,16 @@ WireframeEngine.prototype = {
       scale: new THREE.Vector3(1,1,1),
       clipToViewport: true,
       clipToFrustrum: true,
-      near: null
+      near: null,
+      alpha: 1.0,
+      materials: initMaterials
     } ;
 
     return newModel ;
   },
 
   parseWavefrontObj: function (data) {
-    var modelDef = { vertices: [], lines: [] } ;
+    var modelDef = { vertices: [], lines: {} } ;
 
     // regex for vertices
     var re = /^v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/gm ;
@@ -114,60 +129,88 @@ WireframeEngine.prototype = {
 
     // regex for faces
     //(\d*)\/(\d*)\/(\d*)
-    re = /^f\s(.+)/gm ;
-    while ((match = re.exec (data)) !== null) {
-      // now split this apart
-      var fre = /(\d*)\/(\d*)\/(\d*)/g ;
-      var fmatch ;
-      var firstV = null ;
-      var lastV ;
-      //console.log (JSON.stringify(match, 2, 2)) ;
+    var face_re = /^f\s(.+)/ ;
+    var material_re = /^usemtl\s+(.+)/ ;
+    datalines = data.split('\n') ;
+    var materialName = null ;
 
-      // convert faces into lines
-      while ((fmatch = fre.exec (match[1])) !== null) {
-        //console.log (JSON.stringify(fmatch, 2, 2)) ;
-        // format is f v/t/n    v=vertex, tv=texture coord, nv=normal
-        var v = parseInt(fmatch[1]) - 1 ; // we only care about the face vertex
-        if (firstV === null) {
-          firstV = v ;
-        } else {
-          modelDef.lines.push (lastV) ;
-          modelDef.lines.push (v) ;
+    for (var i = 0; i < datalines.length; i++) {
+      var line = datalines[i] ;
+
+      if ((match = material_re.exec (line)) !== null) {
+        var newName = match[1] ;
+        if (materialName === null || !modelDef.lines.hasOwnProperty(newName)) {
+          modelDef.lines[newName] = [] ;
         }
-        lastV = v ;
-      }
+        materialName = newName ;
 
-      modelDef.lines.push (firstV) ;
-      modelDef.lines.push (lastV) ;
+      } else if ((match = face_re.exec (line)) !== null) {
+
+        // if no material, create one
+        if (materialName === null) {
+          materialName = "default" ;
+          modelDef.lines[materialName] = [] ;
+        }
+
+        // now split this apart
+        var fre = /(\d*)\/(\d*)\/(\d*)/g ;
+        var fmatch ;
+        var firstV = null ;
+        var lastV ;
+        //console.log (JSON.stringify(match, 2, 2)) ;
+
+        // convert faces into lines
+        while ((fmatch = fre.exec (match[1])) !== null) {
+          //console.log (JSON.stringify(fmatch, 2, 2)) ;
+          // format is f v/t/n    v=vertex, tv=texture coord, nv=normal
+          var v = parseInt(fmatch[1]) - 1 ; // we only care about the face vertex
+          if (firstV === null) {
+            firstV = v ;
+          } else {
+            modelDef.lines[materialName].push (lastV) ;
+            modelDef.lines[materialName].push (v) ;
+          }
+          lastV = v ;
+        }
+
+        modelDef.lines[materialName].push (firstV) ;
+        modelDef.lines[materialName].push (lastV) ;
+      }
     }
 
     // now do a line check for no line overdraw, horrible O(n^2) thing
-    var optimizedLines = [] ;
-    for (var i = 0; i < modelDef.lines.length; i += 2) {
-      var v1 = modelDef.lines[i] ;
-      var v2 = modelDef.lines[i + 1] ;
+    var mats = Object.keys(modelDef.lines) ;
 
-      //console.log (v1 + " " + v2) ;
+    for (var mi = 0; mi < mats.length; mi++) {
+      var lines = modelDef.lines[mats[mi]] ;
+      var optimizedLines = [] ;
+      for (var i = 0; i < lines.length; i += 2) {
+        var v1 = lines[i] ;
+        var v2 = lines[i + 1] ;
 
-      var found = false ;
-      for (var i2 = 0; i2 < optimizedLines.length; i2 += 2) {
-        if (((v1 === optimizedLines[i2] && v2 === optimizedLines[i2 + 1]) ||
-             (v2 === optimizedLines[i2] && v1 === optimizedLines[i2 + 1]))) {
-          found = true ;
-          break ;
+        //console.log (v1 + " " + v2) ;
+
+        var found = false ;
+        for (var i2 = 0; i2 < optimizedLines.length; i2 += 2) {
+          if (((v1 === optimizedLines[i2] && v2 === optimizedLines[i2 + 1]) ||
+               (v2 === optimizedLines[i2] && v1 === optimizedLines[i2 + 1]))) {
+            found = true ;
+            break ;
+          }
         }
-      }
 
-      if (!found) {
-        optimizedLines.push (v1) ;
-        optimizedLines.push (v2) ;
-      }
+        if (!found) {
+          optimizedLines.push (v1) ;
+          optimizedLines.push (v2) ;
+        }
 
+      }
+      modelDef.lines[mats[mi]] = optimizedLines ;
     }
 
     //console.log (JSON.stringify(optimizedLines, 2, 2)) ;
 
-    modelDef.lines = optimizedLines ;
+
 
 
 
@@ -219,25 +262,6 @@ WireframeEngine.prototype = {
     model.xformedVerts = vertsXYZW ;
     //console.log (JSON.stringify(model.xformedVerts, 2, 2)) ;
 
-    /*
-    var verts = model.def.vertices.slice(0) ;
-    verts = combinedM.applyToVector3Array (verts) ;
-
-    //console.log (JSON.stringify(verts, 2, 2)) ;
-
-    // convert NP to screen space and store as 2D verts with w
-    var verts2DW = [] ;
-    for (var i = 0; i < verts.length; i += 3 ) {
-      //console.log (verts[i] + " " + verts[i+1] + " " + verts[i+2]) ;
-      verts2DW.push (model.viewX + (verts[i] * model.viewWidth) / (verts[i + 2]) + model.viewWidth / 2) ;
-      verts2DW.push (model.viewY + (verts[i + 1] * model.viewHeight) / (verts[i + 2]) + model.viewHeight / 2) ;
-      verts2DW.push (verts[i + 2]) ;
-    }
-
-    model.xformedVerts = verts2DW ;
-
-    //console.log (JSON.stringify(model.xformedVerts, 2, 2)) ;
-    */
   },
 
 
@@ -269,7 +293,7 @@ WireframeEngine.prototype = {
     modelGraphics.clear() ;
 
     //modelGraphics.lineStyle (4, Math.random() * 0xFFFFFF, 1) ;
-    modelGraphics.lineStyle (thickness, 0xFFFFFF, 1) ;
+    modelGraphics.lineStyle (thickness, 0xFFFFFF, model.alpha) ;
 
     var lastVert = THREE.Vector3() ;
 
@@ -277,7 +301,7 @@ WireframeEngine.prototype = {
 
     var near = model.near ;
     var verts = model.xformedVerts ;
-    var lines = model.def.lines ;
+
     var vX = model.viewX ;
     var vY = model.viewY ;
     var vW = model.viewWidth ;
@@ -285,78 +309,83 @@ WireframeEngine.prototype = {
     var clipViewport = model.clipToViewport ;
     var clipFrustrum = model.clipToFrustrum ;
 
+    var mats = Object.keys(model.def.lines) ;
 
-    for (var i = 0; i < model.def.lines.length; i += 2) {
-      //modelGraphics.lineStyle (thickness, 0xFFFFFF, 1) ;
+    for (var mi = 0; mi < mats.length; mi++) {
+      var lines = model.def.lines[mats[mi]] ;
+      var matDef = model.materials[mats[mi]] ;
+      modelGraphics.lineStyle (thickness, matDef.color, matDef.alpha * model.alpha) ;
 
-      // lookup vert for this line
-      var firstVertIdx = lines[i] * 4 ;
-      var secVertIdx = lines[i + 1] * 4 ;
+      for (var i = 0; i < lines.length; i += 2) {
+        //modelGraphics.lineStyle (thickness, 0xFFFFFF, 1) ;
 
-      var x1 = verts[firstVertIdx] ;
-      var y1 = verts[firstVertIdx+1] ;
-      var z1 = verts[firstVertIdx+2] ;
-      var w1 = verts[firstVertIdx+3] ;
+        // lookup vert for this line
+        var firstVertIdx = lines[i] * 4 ;
+        var secVertIdx = lines[i + 1] * 4 ;
 
-      var x2 = verts[secVertIdx] ;
-      var y2 = verts[secVertIdx+1] ;
-      var z2 = verts[secVertIdx+2] ;
-      var w2 = verts[secVertIdx+3] ;
+        var x1 = verts[firstVertIdx] ;
+        var y1 = verts[firstVertIdx+1] ;
+        var z1 = verts[firstVertIdx+2] ;
+        var w1 = verts[firstVertIdx+3] ;
 
-      if (clipFrustrum) {
-        // do near-plane clipping if needed
-        if (w1 < near && w2 < near) { // if both are behind, just don't render
-          //modelGraphics.lineStyle (thickness, 0xFF0000, 0.2) ;
-          continue ;
+        var x2 = verts[secVertIdx] ;
+        var y2 = verts[secVertIdx+1] ;
+        var z2 = verts[secVertIdx+2] ;
+        var w2 = verts[secVertIdx+3] ;
+
+        if (clipFrustrum) {
+          // do near-plane clipping if needed
+          if (w1 < near && w2 < near) { // if both are behind, just don't render
+            //modelGraphics.lineStyle (thickness, 0xFF0000, 0.2) ;
+            continue ;
+          }
+
+          if (w1 >= near && w2 < near) { // if v1 is in front, and v2 is behind, clip v2 at intersection w/view plane
+            //modelGraphics.lineStyle (thickness, 0xFFFF00, 0.5) ;
+            var n = (w1 - near) / (w1 - w2) ;
+            var xc = (n * x2) + ((1-n) * x1) ;
+            var yc = (n * y2) + ((1-n) * y1) ;
+            var zc = (n * z2) + ((1-n) * z1) ;
+            var wc = (n * w2) + ((1-n) * w1) ;
+            x2 = xc ;
+            y2 = yc ;
+            z2 = zc ;
+            w2 = wc ;
+          }
+
+          if (w1 < near && w2 >= near) { // if v2 is behind, and v1 is in front, clip v1 at intersection w/view plane
+            //modelGraphics.lineStyle (thickness, 0xFF00FF, 0.5) ;
+            var n = (w2 - near) / (w2 - w1) ;
+            var xc = (n * x1) + ((1-n) * x2) ;
+            var yc = (n * y1) + ((1-n) * y2) ;
+            var zc = (n * z1) + ((1-n) * z2) ;
+            var wc = (n * w1) + ((1-n) * w2) ;
+            x1 = xc ;
+            y1 = yc ;
+            z1 = zc ;
+            w1 = wc ;
+          }
         }
 
-        if (w1 >= near && w2 < near) { // if v1 is in front, and v2 is behind, clip v2 at intersection w/view plane
-          //modelGraphics.lineStyle (thickness, 0xFFFF00, 0.5) ;
-          var n = (w1 - near) / (w1 - w2) ;
-          var xc = (n * x2) + ((1-n) * x1) ;
-          var yc = (n * y2) + ((1-n) * y1) ;
-          var zc = (n * z2) + ((1-n) * z1) ;
-          var wc = (n * w2) + ((1-n) * w1) ;
-          x2 = xc ;
-          y2 = yc ;
-          z2 = zc ;
-          w2 = wc ;
+        // project both vertices
+        var px1 = vX + (x1 * vW) / w1 + vW / 2 ;
+        var py1 = vY + (y1 * vH) / w1 + vH / 2 ;
+
+        var px2 = vX + (x2 * vW) / w2 + vW / 2 ;
+        var py2 = vY + (y2 * vH) / w2 + vH / 2 ;
+
+        // Finally, do cohen-sutherlane clipping for 2D line segment (if desired)
+        if (clipViewport) {
+          this.clipAndDrawLine2D (
+            px1, py1,
+            px2, py2
+          ) ;
+        } else {
+          modelGraphics.moveTo (px1, py1) ;
+          modelGraphics.lineTo (px2, py2) ;
         }
-
-        if (w1 < near && w2 >= near) { // if v2 is behind, and v1 is in front, clip v1 at intersection w/view plane
-          //modelGraphics.lineStyle (thickness, 0xFF00FF, 0.5) ;
-          var n = (w2 - near) / (w2 - w1) ;
-          var xc = (n * x1) + ((1-n) * x2) ;
-          var yc = (n * y1) + ((1-n) * y2) ;
-          var zc = (n * z1) + ((1-n) * z2) ;
-          var wc = (n * w1) + ((1-n) * w2) ;
-          x1 = xc ;
-          y1 = yc ;
-          z1 = zc ;
-          w1 = wc ;
-        }
-      }
-
-      // project both vertices
-      var px1 = vX + (x1 * vW) / w1 + vW / 2 ;
-      var py1 = vY + (y1 * vH) / w1 + vH / 2 ;
-
-      var px2 = vX + (x2 * vW) / w2 + vW / 2 ;
-      var py2 = vY + (y2 * vH) / w2 + vH / 2 ;
-
-      // Finally, do cohen-sutherlane clipping for 2D line segment (if desired)
-      if (clipViewport) {
-        this.clipAndDrawLine2D (
-          px1, py1,
-          px2, py2
-        ) ;
-      } else {
-        modelGraphics.moveTo (px1, py1) ;
-        modelGraphics.lineTo (px2, py2) ;
-      }
-
-
-    }
+      } // lines
+    } // materials
   },
 
 };

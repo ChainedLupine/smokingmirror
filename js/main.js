@@ -11,20 +11,22 @@ var cubeModelDef = {
     1, -1, -1,
   ],
 
-  lines: [
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7
-  ]
+  lines: {
+    default: [
+      0, 1,
+      1, 2,
+      2, 3,
+      3, 0,
+      4, 5,
+      5, 6,
+      6, 7,
+      7, 4,
+      0, 4,
+      1, 5,
+      2, 6,
+      3, 7
+    ]
+  }
 };
 
 var canvas = { w: 900, h: 600 } ;
@@ -59,6 +61,10 @@ $(document).ready (function() {
 
     cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
 
+    cubeModel.materials.FlameMat.color = 0xFF4212 ;
+    cubeModel.materials.FlameMat.alpha = 0.7 ;
+    cubeModel.materials.BaseMat.color = 0xE0FFFC ;
+
     //cubeModel.clipToViewport = false ;
 
     startup() ;
@@ -70,7 +76,7 @@ $(document).ready (function() {
 
 function startup() {
 
-  wireframeEngine.viewAsPerspective (cubeModel, 90, 50, 50, canvas.w - 50, canvas.h - 50, 1, 100) ;
+  wireframeEngine.viewAsPerspective (cubeModel, 90, 50, 50, canvas.w - 50, canvas.h - 50, 0.1, 100) ;
 
   var modelGraphics = new PIXI.Graphics() ;
 
@@ -296,7 +302,7 @@ function startup() {
     sliderClip.height = 40 ;
     sliderClip.minimum = 0.01 ;
     sliderClip.maximum = 10 ;
-    sliderClip.value = 1.0 ;
+    sliderClip.value = 0.1 ;
     uiGroup.addChild(sliderClip);
 
 
