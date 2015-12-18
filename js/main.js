@@ -247,7 +247,7 @@ function startup() {
     sliderLineThickness.minimum = 1 ;
     sliderLineThickness.maximum = 30 ;
     sliderLineThickness.value = lineThickness ;
-    //uiGroup.addChild(sliderLineThickness);
+    uiGroup.addChild(sliderLineThickness);
 
     var sliderX = new GOWN.Slider(null, guitheme);
     sliderX.width = 300;
