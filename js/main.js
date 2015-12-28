@@ -30,7 +30,6 @@ var cubeModelDef = {
 };
 
 var canvas = { w: 900, h: 600 } ;
-var wireframeEngine = new WireframeEngine() ;
 
 var cubeModel ;
 
@@ -57,9 +56,9 @@ $(document).ready (function() {
   */
 
   $.get ('assets/objects/player2.obj', function (data) {
-    var cubeModelDef = wireframeEngine.parseWavefrontObj (data) ;
+    var cubeModelDef = Smokingmirror.loader.parseWavefront (data) ;
 
-    cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
+    cubeModel = new Smokingmirror.Model(cubeModelDef) ;
 
     cubeModel.materials.FlameMat.color = 0xFF4212 ;
     cubeModel.materials.FlameMat.alpha = 0.7 ;
@@ -76,7 +75,8 @@ $(document).ready (function() {
 
 function startup() {
 
-  wireframeEngine.viewAsPerspective (cubeModel, 90, 50, 50, canvas.w - 50, canvas.h - 50, 0.1, 100) ;
+  Smokingmirror.render.setViewport (50, 50, canvas.w - 50, canvas.h - 50, 0.1, 1000) ;
+  Smokingmirror.render.setViewAsPerpsective (90) ;
 
   var modelGraphics = new PIXI.Graphics() ;
 
@@ -169,8 +169,8 @@ function startup() {
 
   var guitheme;
 
-  var modelPos = new THREE.Vector3(0, 0, -7.0) ;
-  var modelRot = new THREE.Vector3(90, 0.01, 0.01) ;
+  var modelPos = new Smokingmirror.Vector3(0, 0, -7.0) ;
+  var modelRot = new Smokingmirror.Vector3(90, 0.01, 0.01) ;
 
   function onCompleteThemeLoad() {
     // initialize theme
@@ -420,9 +420,12 @@ function startup() {
       cubeModel.rotation.x = modelRot.x * 0.0174533 ;
       cubeModel.rotation.y = modelRot.y * 0.0174533 ;
       cubeModel.rotation.z = modelRot.z * 0.0174533 ;
-      wireframeEngine.applyModelTransforms (cubeModel) ;
-      wireframeEngine.generateLines (cubeModel) ;
-      wireframeEngine.renderModelToGraphics (cubeModel, modelGraphics, lineThickness) ;
+
+      cubeModel.update() ;
+
+
+      modelGraphics.clear() ;
+      cubeModel.render(modelGraphics) ;
 
       renderTextureBlur.render(visualEffectsContainer, null, true);
       renderTextureGlow.render(visualEffectsContainer, null, true);
