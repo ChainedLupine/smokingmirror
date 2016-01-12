@@ -44,6 +44,7 @@ Smokingmirror.Model.prototype = {
     transM.makeTranslation (this.position.x, this.position.y, this.position.z) ;
 
     this.modelMatrix.identity() ;
+    this.modelMatrix.multiply (Smokingmirror.render.viewMatrixInv) ;
     this.modelMatrix.multiply (transM) ;
     this.modelMatrix.multiply (rotM) ;
     this.modelMatrix.multiply (scaleM) ;

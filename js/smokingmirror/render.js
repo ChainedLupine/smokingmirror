@@ -9,6 +9,9 @@ Smokingmirror.WireframeRender = function() {
     this.viewY = 0 ;
     this.clipToViewport = true ;
     this.clipToFrustrum = true ;
+    // to note about view matrix:  Only orthogonal, no scaling/skewing!
+    this.viewMatrix = new Smokingmirror.Matrix4() ;
+    this.viewMatrixInv = new Smokingmirror.Matrix4() ;
 
     this.nearPlane = 0 ;
 
@@ -108,6 +111,32 @@ Smokingmirror.WireframeRender.prototype = {
   setViewAsPerpsective: function (fovAngle) {
     this.projMatrix = Smokingmirror.geometry.generatePerspectiveView (fovAngle,
       this.viewWidth, this.viewHeight, this.nearPlane, this.farPlane) ;
+  },
+
+  setCamera: function (pos, rot) {
+    // calculate view matrix
+    this.viewMatrix.identity() ;
+    var posM = new Smokingmirror.Matrix4() ;
+    posM.setPosition (pos) ;
+    this.viewMatrix.multiply (posM) ;
+
+    if (typeof (rot) !== 'undefined') {
+      var rotM = new Smokingmirror.Matrix4() ;
+      rotM.makeRotationFromVector3 (rot) ;
+      this.viewMatrix.multiply (rotM) ;
+    }
+
+    // calculate inverse
+    var temp = new Smokingmirror.Matrix4() ;
+    temp.copy (this.viewMatrix) ;
+    temp.setPosition ({ x: 0, y: 0, z: 0}) ;
+    temp.transpose() ;
+    //temp.identity() ;
+    //temp.makeRotationFromVector3 (new Smokingmirror.Vector3(0, 0, 45 * 0.0174533)) ;
+    var e = this.viewMatrix.elements ;
+
+    temp.setPosition ({ x: -e[12], y: -e[13], z: -e[14]}) ;
+    this.viewMatrixInv = temp ;
   },
 
   renderModelToGraphics: function (model, modelGraphics, thickness) {

@@ -47,6 +47,7 @@ if (renderType === "") {
 
 console.log (renderType) ;
 
+var player ;
 
 $(document).ready (function() {
 
@@ -54,21 +55,17 @@ $(document).ready (function() {
   cubeModel = wireframeEngine.setupModel (cubeModelDef) ;
   startup() ;
   */
+  var playerShipDef ;
 
-  $.get ('assets/objects/player2.obj', function (data) {
-    var cubeModelDef = Smokingmirror.loader.parseWavefront (data) ;
-
-    cubeModel = new Smokingmirror.Model(cubeModelDef) ;
-
-    cubeModel.materials.FlameMat.color = 0xFF4212 ;
-    cubeModel.materials.FlameMat.alpha = 0.7 ;
-    cubeModel.materials.BaseMat.color = 0xE0FFFC ;
-
-    //cubeModel.clipToViewport = false ;
+  $.when (
+    $.get ('assets/objects/player2.obj', function (data) {
+      playerShipDef = data ;
+    })
+  ).then (function() {
+    player = new Game.Player (playerShipDef) ;
 
     startup() ;
   }) ;
-
 
 }) ;
 
@@ -255,7 +252,7 @@ function startup() {
     sliderX.minimum = -5  ;
     sliderX.maximum = 5 ;
     sliderX.value = 0.001 ;
-    uiGroup.addChild(sliderX);
+    //uiGroup.addChild(sliderX);
 
     var sliderY = new GOWN.Slider(null, guitheme);
     sliderY.width = 300;
@@ -263,7 +260,7 @@ function startup() {
     sliderY.minimum = -5 ;
     sliderY.maximum = 5 ;
     sliderY.value = 0.001 ;
-    uiGroup.addChild(sliderY);
+    //uiGroup.addChild(sliderY);
 
     var sliderZ = new GOWN.Slider(null, guitheme);
     sliderZ.width = 300;
@@ -279,7 +276,7 @@ function startup() {
     sliderRotX.minimum = -180 ;
     sliderRotX.maximum = 180 ;
     sliderRotX.value = modelRot.x ;
-    uiGroup.addChild(sliderRotX);
+    //uiGroup.addChild(sliderRotX);
 
     var sliderRotY = new GOWN.Slider(null, guitheme);
     sliderRotY.width = 300;
@@ -287,7 +284,7 @@ function startup() {
     sliderRotY.minimum = -180 ;
     sliderRotY.maximum = 180 ;
     sliderRotY.value = modelRot.y ;
-    uiGroup.addChild(sliderRotY);
+    //uiGroup.addChild(sliderRotY);
 
     var sliderRotZ = new GOWN.Slider(null, guitheme);
     sliderRotZ.width = 300;
@@ -295,7 +292,7 @@ function startup() {
     sliderRotZ.minimum = -180 ;
     sliderRotZ.maximum = 180 ;
     sliderRotZ.value = modelRot.z ;
-    uiGroup.addChild(sliderRotZ);
+    //uiGroup.addChild(sliderRotZ);
 
     var sliderClip = new GOWN.Slider(null, guitheme);
     sliderClip.width = 300;
@@ -400,7 +397,11 @@ function startup() {
         ["gown.js/themes/assets/metalworks/metalworks.json"], onCompleteThemeLoad);
 
   var moveAxisZVel = 0 ;
-  cubeModel.position.z = modelPos.z ;
+  //player.model.position.z = modelPos.z ;
+
+  player.pos.x = modelPos.x ;
+  player.pos.y = modelPos.y ;
+  player.pos.z = modelPos.z ;
 
   function animate() {
 
@@ -410,22 +411,28 @@ function startup() {
       //cubeModel.scale.y = 0.5 ;
       //cubeModel.scale.z = 0.5 ;
 
-      cubeModel.position.x = modelPos.x ;
-      cubeModel.position.y = modelPos.y ;
+      player.pos.x = modelPos.x ;
+      player.pos.y = modelPos.y ;
       //cubeModel.position.z = modelPos.z ;
-      cubeModel.position.z += moveAxisZVel ;
+      player.pos.z += moveAxisZVel ;
       //cubeModel.rotation.x += 0.01 ;
       //cubeModel.rotation.y += 0.01 ;
       //cubeModel.rotation.z += 0.01 ;
-      cubeModel.rotation.x = modelRot.x * 0.0174533 ;
-      cubeModel.rotation.y = modelRot.y * 0.0174533 ;
-      cubeModel.rotation.z = modelRot.z * 0.0174533 ;
+      player.rot.x = modelRot.x * 0.0174533 ;
+      player.rot.y = modelRot.y * 0.0174533 ;
+      player.rot.z = modelRot.z * 0.0174533 ;
 
-      cubeModel.update() ;
+      var zz = Math.sin(animTick) ;
+      Smokingmirror.render.setCamera (
+        new Smokingmirror.Vector3 (0 + 0.1 * Math.cos(animTick), 4, 5),
+        new Smokingmirror.Vector3 ((-45 + (3 * zz)) * 0.0174533, 0 * 0.0174533, (0 * zz) * 0.0174533)
+      );
+
+      player.update() ;
 
 
       modelGraphics.clear() ;
-      cubeModel.render(modelGraphics) ;
+      player.render(modelGraphics) ;
 
       renderTextureBlur.render(visualEffectsContainer, null, true);
       renderTextureGlow.render(visualEffectsContainer, null, true);
