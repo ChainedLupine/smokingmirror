@@ -1,4 +1,6 @@
-function keyboard(keyCode) {
+window.game.keyboard = function keyboard(keyCode) {
+  "use strict" ;
+
   var key = {};
   key.code = keyCode;
   key.isDown = false;
@@ -9,7 +11,9 @@ function keyboard(keyCode) {
   //The `downHandler`
   key.downHandler = function(event) {
     if (event.keyCode === key.code) {
-      if (key.isUp && key.press) key.press();
+      if (key.isUp && key.press) {
+        key.press();
+      }
       key.isDown = true;
       key.isUp = false;
     }
@@ -19,7 +23,9 @@ function keyboard(keyCode) {
   //The `upHandler`
   key.upHandler = function(event) {
     if (event.keyCode === key.code) {
-      if (key.isDown && key.release) key.release();
+      if (key.isDown && key.release) {
+        key.release();
+      }
       key.isDown = false;
       key.isUp = true;
     }
@@ -34,4 +40,4 @@ function keyboard(keyCode) {
     "keyup", key.upHandler.bind(key), false
   );
   return key;
-}
+};

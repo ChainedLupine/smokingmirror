@@ -116,15 +116,17 @@ Smokingmirror.WireframeRender.prototype = {
   setCamera: function (pos, rot) {
     // calculate view matrix
     this.viewMatrix.identity() ;
-    var posM = new Smokingmirror.Matrix4() ;
-    posM.setPosition (pos) ;
-    this.viewMatrix.multiply (posM) ;
 
     if (typeof (rot) !== 'undefined') {
       var rotM = new Smokingmirror.Matrix4() ;
       rotM.makeRotationFromVector3 (rot) ;
       this.viewMatrix.multiply (rotM) ;
     }
+    
+    var posM = new Smokingmirror.Matrix4() ;
+    posM.setPosition (pos) ;
+    this.viewMatrix.multiply (posM) ;
+
 
     // calculate inverse
     var temp = new Smokingmirror.Matrix4() ;
