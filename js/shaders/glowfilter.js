@@ -1,4 +1,4 @@
-GlowFilter = function() {
+var GlowFilter = function() {
     var uniforms = {
       sumBias: {
         type: 'f',

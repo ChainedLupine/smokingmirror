@@ -1,12 +1,4 @@
-"use strict";
-/* globals Smokingmirror */
-
-Smokingmirror.Loader = function() {
-
-
-} ;
-
-Smokingmirror.Loader.prototype = {
+var Loader = {
   parseWavefront: function (data) {
     var modelDef = { vertices: [], lines: {} } ;
 
@@ -107,4 +99,4 @@ Smokingmirror.Loader.prototype = {
   },
 }; // prototype
 
-Smokingmirror.loader = new Smokingmirror.Loader() ;
+module.exports = Loader ;

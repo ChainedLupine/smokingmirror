@@ -1,6 +1,3 @@
-"use strict";
-/* globals Smokingmirror */
-/* globals console */
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -10,7 +7,11 @@
  * @author egraether / http://egraether.com/
  * @author WestLangley / http://github.com/WestLangley
  */
- Smokingmirror.Vector3 = function ( x, y, z ) {
+
+var Matrix4 = require('./matrix4') ;
+var misc = require('./misc') ;
+
+var Vector3 = function ( x, y, z ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
@@ -18,9 +19,9 @@
 
 };
 
-Smokingmirror.Vector3.prototype = {
+Vector3.prototype = {
 
-	constructor: Smokingmirror.Vector3,
+	constructor: Vector3,
 
 	set: function ( x, y, z ) {
 
@@ -98,14 +99,7 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	add: function ( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
-			return this.addVectors( v, w );
-
-		}
+	add: function ( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -145,14 +139,7 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	sub: function ( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
-			return this.subVectors( v, w );
-
-		}
+	sub: function ( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -182,14 +169,7 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	multiply: function ( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
-			return this.multiplyVectors( v, w );
-
-		}
+	multiply: function ( v ) {
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -224,44 +204,6 @@ Smokingmirror.Vector3.prototype = {
 		return this;
 
 	},
-
-	applyEuler: function () {
-
-		var quaternion;
-
-		return function applyEuler( euler ) {
-
-			if ( euler instanceof Smokingmirror.Euler === false ) {
-
-				console.error( 'THREE.Vector3: .applyEuler() now expects a Euler rotation rather than a Vector3 and order.' );
-
-			}
-
-			if ( quaternion === undefined ) quaternion = new Smokingmirror.Quaternion();
-
-			this.applyQuaternion( quaternion.setFromEuler( euler ) );
-
-			return this;
-
-		};
-
-	}(),
-
-	applyAxisAngle: function () {
-
-		var quaternion;
-
-		return function applyAxisAngle( axis, angle ) {
-
-			if ( quaternion === undefined ) quaternion = new Smokingmirror.Quaternion();
-
-			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-			return this;
-
-		};
-
-	}(),
 
 	applyMatrix3: function ( m ) {
 
@@ -340,35 +282,35 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	project: function () {
+	project: (function () {
 
 		var matrix;
 
 		return function project( camera ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined ) { matrix = new Matrix4(); }
 
 			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 			return this.applyProjection( matrix );
 
 		};
 
-	}(),
+	})(),
 
-	unproject: function () {
+	unproject: (function () {
 
 		var matrix;
 
 		return function unproject( camera ) {
 
-			if ( matrix === undefined ) matrix = new Smokingmirror.Matrix4();
+			if ( matrix === undefined ) { matrix = new Matrix4(); }
 
 			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 			return this.applyProjection( matrix );
 
 		};
 
-	}(),
+	})(),
 
 	transformDirection: function ( m ) {
 
@@ -437,7 +379,7 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: (function () {
 
 		var min, max;
 
@@ -445,8 +387,8 @@ Smokingmirror.Vector3.prototype = {
 
 			if ( min === undefined ) {
 
-				min = new Smokingmirror.Vector3();
-				max = new Smokingmirror.Vector3();
+				min = new Vector3();
+				max = new Vector3();
 
 			}
 
@@ -457,7 +399,7 @@ Smokingmirror.Vector3.prototype = {
 
 		};
 
-	}(),
+	})(),
 
 	clampLength: function ( min, max ) {
 
@@ -573,14 +515,7 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	cross: function ( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
-			return this.crossVectors( v, w );
-
-		}
+	cross: function ( v ) {
 
 		var x = this.x, y = this.y, z = this.z;
 
@@ -605,13 +540,13 @@ Smokingmirror.Vector3.prototype = {
 
 	},
 
-	projectOnVector: function () {
+	projectOnVector: (function () {
 
 		var v1, dot;
 
 		return function projectOnVector( vector ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			v1.copy( vector ).normalize();
 
@@ -621,15 +556,15 @@ Smokingmirror.Vector3.prototype = {
 
 		};
 
-	}(),
+	})(),
 
-	projectOnPlane: function () {
+	projectOnPlane: (function () {
 
 		var v1;
 
 		return function projectOnPlane( planeNormal ) {
 
-			if ( v1 === undefined ) v1 = new Smokingmirror.Vector3();
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			v1.copy( this ).projectOnVector( planeNormal );
 
@@ -637,9 +572,9 @@ Smokingmirror.Vector3.prototype = {
 
 		};
 
-	}(),
+	})(),
 
-	reflect: function () {
+	reflect: (function () {
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
@@ -648,13 +583,13 @@ Smokingmirror.Vector3.prototype = {
 
 		return function reflect( normal ) {
 
-			if ( v1 === undefined ) v1 = new Smokingmirror.Vector3();
+			if ( v1 === undefined ) { v1 = new Vector3(); }
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
 		};
 
-	}(),
+	})(),
 
 	angleTo: function ( v ) {
 
@@ -662,7 +597,7 @@ Smokingmirror.Vector3.prototype = {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( Smokingmirror.Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( misc.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -679,42 +614,6 @@ Smokingmirror.Vector3.prototype = {
 		var dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
-
-	},
-
-	setEulerFromRotationMatrix: function ( m, order ) {
-
-		console.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
-
-	},
-
-	setEulerFromQuaternion: function ( q, order ) {
-
-		console.error( 'THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.' );
-
-	},
-
-	getPositionFromMatrix: function ( m ) {
-
-		console.warn( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
-
-		return this.setFromMatrixPosition( m );
-
-	},
-
-	getScaleFromMatrix: function ( m ) {
-
-		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
-
-		return this.setFromMatrixScale( m );
-
-	},
-
-	getColumnFromMatrix: function ( index, matrix ) {
-
-		console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
-
-		return this.setFromMatrixColumn( index, matrix );
 
 	},
 
@@ -764,7 +663,7 @@ Smokingmirror.Vector3.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -776,8 +675,8 @@ Smokingmirror.Vector3.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === undefined ) { array = []; }
+		if ( offset === undefined ) { offset = 0; }
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -789,7 +688,7 @@ Smokingmirror.Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) { offset = 0; }
 
 		index = index * attribute.itemSize + offset;
 
@@ -802,3 +701,5 @@ Smokingmirror.Vector3.prototype = {
 	}
 
 };
+
+module.exports = Vector3 ;

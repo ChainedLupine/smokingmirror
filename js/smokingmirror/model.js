@@ -1,21 +1,29 @@
-"use strict";
-/* globals Smokingmirror */
 
-Smokingmirror.Model = function(def) {
+var Matrix4 = require('./math/matrix4') ;
+var Vector3 = require('./math/vector3') ;
+var Geometry = require('./geometry') ;
+
+var Model = function(def, renderer) {
+  if (typeof renderer === 'undefined') {
+    throw "Must define a renderer!" ;
+  }
+
+  this.renderer = renderer ;
+
   this.lineThickness = 1.0 ;
   this.alpha = 1.0 ;
   this.transformedVerts = [] ;
-  this.modelMatrix = new Smokingmirror.Matrix4() ;
-  this.rotation = new Smokingmirror.Vector3() ;
-  this.position = new Smokingmirror.Vector3() ;
-  this.scale = new Smokingmirror.Vector3(1, 1, 1) ;
+  this.modelMatrix = new Matrix4() ;
+  this.rotation = new Vector3() ;
+  this.position = new Vector3() ;
+  this.scale = new Vector3(1, 1, 1) ;
 
   if (typeof def !== 'undefined') {
     this.loadDef (def) ;
   }
 };
 
-Smokingmirror.Model.prototype = {
+Model.prototype = {
   loadDef: function (modelDef) {
     var initMaterials = {} ;
     var mats = Object.keys(modelDef.lines) ;
@@ -34,17 +42,17 @@ Smokingmirror.Model.prototype = {
 
   applyModelTransforms: function () {
     // first, build all of our matrices
-    var scaleM = new Smokingmirror.Matrix4() ;
+    var scaleM = new Matrix4() ;
     scaleM.scale (this.scale) ;
 
-    var rotM = new Smokingmirror.Matrix4() ;
+    var rotM = new Matrix4() ;
     rotM.makeRotationFromVector3 (this.rotation) ;
 
-    var transM = new Smokingmirror.Matrix4() ;
+    var transM = new Matrix4() ;
     transM.makeTranslation (this.position.x, this.position.y, this.position.z) ;
 
     this.modelMatrix.identity() ;
-    this.modelMatrix.multiply (Smokingmirror.render.viewMatrixInv) ;
+    this.modelMatrix.multiply (this.renderer.viewMatrixInv) ;
     this.modelMatrix.multiply (transM) ;
     this.modelMatrix.multiply (rotM) ;
     this.modelMatrix.multiply (scaleM) ;
@@ -55,12 +63,14 @@ Smokingmirror.Model.prototype = {
 
   update: function() {
     this.applyModelTransforms () ;
-    this.transformedVerts = Smokingmirror.geometry.generateTransformedVerts (Smokingmirror.render.projMatrix, this.modelMatrix, this.def.vertices) ;
+    this.transformedVerts = Geometry.generateTransformedVerts (this.renderer.projMatrix, this.modelMatrix, this.def.vertices) ;
   },
 
   render: function(graphics) {
-    Smokingmirror.render.renderModelToGraphics(this, graphics, this.lineThickness) ;
+    this.renderer.renderModelToGraphics(this, graphics, this.lineThickness) ;
   }
 
 
 };
+
+module.exports = Model ;

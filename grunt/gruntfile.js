@@ -43,7 +43,10 @@ module.exports = function (grunt) {
 					describe: true,
 					expect: true,
 					it: true,
-          console: true
+          console: true,
+          '$': true,
+          PIXI: true,
+          module: true,
 				},
 				ignores: [
 				],
@@ -96,7 +99,8 @@ module.exports = function (grunt) {
           cwd: '../libs',
           src: [
             'dat.gui/**/*.js',
-            'pixi/**/*.js'
+            'pixi/**/*.js',
+            'jquery/**/*.js'
           ],
           dest: '../build/libs',
         }],
@@ -126,13 +130,13 @@ module.exports = function (grunt) {
       },
       scripts: {
         files: [ '../js/**/*.js' ],
-        tasks: [ 'jshint:scripts', 'browserify', 'uglify' ],
+        tasks: [ 'jshint:scripts', 'browserify', 'uglify', 'sync' ],
         options: {
           spawn: false,
         },
       },
       assets: {
-        files: [ '../assets/**/*.*' ],
+        files: [ '../assets/**/*.*', '../html/**/*.html' ],
         tasks: [ 'sync' ],
       },
     },

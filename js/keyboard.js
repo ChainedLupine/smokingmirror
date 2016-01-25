@@ -1,4 +1,4 @@
-window.game.keyboard = function keyboard(keyCode) {
+module.exports = function keyboard(keyCode) {
   "use strict" ;
 
   var key = {};

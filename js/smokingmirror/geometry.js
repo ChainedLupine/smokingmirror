@@ -1,18 +1,13 @@
-"use strict";
-/* globals Smokingmirror */
+var Matrix4 = require ('./math/matrix4') ;
 
-Smokingmirror.Geometry = function() {
-
-};
-
-Smokingmirror.Geometry.prototype = {
+var Geometry = {
 
   generatePerspectiveView: function (fovAngle, w, h, near, far) {
 
     //var fov = 1.0 / Math.tan(THREE.Math.degToRad(fovAngle) / 2.0) ;
     var aspect = w / h ;
 
-    var m = new Smokingmirror.Matrix4() ;
+    var m = new Matrix4() ;
 
     return m.makePerspective (fovAngle, aspect, near, far) ;
 
@@ -20,13 +15,13 @@ Smokingmirror.Geometry.prototype = {
   },
 
   generateOrthoView: function (left, right, top, bottom, near, far) {
-    var m = new Smokingmirror.Matrix4() ;
+    var m = new Matrix4() ;
     return m.makeOrthographic (left, right, top, bottom, near, far) ;
   },
 
   // take vertices, project by projMatrix and move by modelMatrix then convert to clip space
   generateTransformedVerts: function (projMatrix, modelMatrix, vertices) {
-    var combinedM = new Smokingmirror.Matrix4() ;
+    var combinedM = new Matrix4() ;
     combinedM.multiplyMatrices (projMatrix, modelMatrix) ;
 
     //console.log (JSON.stringify(model.modelMatrix.elements, 2, 2)) ;
@@ -53,4 +48,4 @@ Smokingmirror.Geometry.prototype = {
 
 }; // prototype
 
-Smokingmirror.geometry = new Smokingmirror.Geometry() ;
+module.exports = Geometry ;

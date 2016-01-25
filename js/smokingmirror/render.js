@@ -1,101 +1,101 @@
-"use strict";
-/* globals Smokingmirror */
+var Matrix4 = require('./math/matrix4') ;
+var Vector3 = require('./math/vector3') ;
+var Geometry = require('./geometry') ;
 
-Smokingmirror.WireframeRender = function() {
+var WireframeRender = function() {
+  "use strict" ;
 
-    this.viewWidth = 0 ;
-    this.viewHeight = 0 ;
-    this.viewX = 0 ;
-    this.viewY = 0 ;
-    this.clipToViewport = true ;
-    this.clipToFrustrum = true ;
-    // to note about view matrix:  Only orthogonal, no scaling/skewing!
-    this.viewMatrix = new Smokingmirror.Matrix4() ;
-    this.viewMatrixInv = new Smokingmirror.Matrix4() ;
+  this.viewWidth = 0 ;
+  this.viewHeight = 0 ;
+  this.viewX = 0 ;
+  this.viewY = 0 ;
+  this.clipToViewport = true ;
+  this.clipToFrustrum = true ;
+  // to note about view matrix:  Only orthogonal, no scaling/skewing!
+  this.viewMatrix = new Matrix4() ;
+  this.viewMatrixInv = new Matrix4() ;
 
-    this.nearPlane = 0 ;
+  this.nearPlane = 0 ;
 
-    var OUTCODES = Object.freeze ({"INSIDE": 0, "LEFT": 1, "RIGHT": 2, "BOTTOM": 4, "TOP": 8}) ;
+  var OUTCODES = Object.freeze ({"INSIDE": 0, "LEFT": 1, "RIGHT": 2, "BOTTOM": 4, "TOP": 8}) ;
 
-    var clip_graphics, clip_xmin, clip_ymin, clip_xmax, clip_ymax ;
+  var clip_graphics, clip_xmin, clip_ymin, clip_xmax, clip_ymax ;
 
-    var computeOutCode2D = function (x, y) {
-      var code = OUTCODES.INSIDE ;
+  var computeOutCode2D = function (x, y) {
+    var code = OUTCODES.INSIDE ;
 
-      if (x < clip_xmin) {
-        code |= OUTCODES.LEFT ;
-      } else if (x > clip_xmax) {
-        code |= OUTCODES.RIGHT ;
-      }
-      if (y < clip_ymin) {
-        code |= OUTCODES.BOTTOM ;
-      } else if (y > clip_ymax) {
-        code |= OUTCODES.TOP ;
-      }
-      return code ;
-    } ;
+    if (x < clip_xmin) {
+      code |= OUTCODES.LEFT ;
+    } else if (x > clip_xmax) {
+      code |= OUTCODES.RIGHT ;
+    }
+    if (y < clip_ymin) {
+      code |= OUTCODES.BOTTOM ;
+    } else if (y > clip_ymax) {
+      code |= OUTCODES.TOP ;
+    }
+    return code ;
+  } ;
 
-    this.setupClip = function (graphics, xmin, ymin, xmax, ymax) {
-      clip_graphics = graphics ;
-      clip_xmin = xmin ;
-      clip_ymin = ymin ;
-      clip_xmax = xmax ;
-      clip_ymax = ymax ;
-    } ;
+  this.setupClip = function (graphics, xmin, ymin, xmax, ymax) {
+    clip_graphics = graphics ;
+    clip_xmin = xmin ;
+    clip_ymin = ymin ;
+    clip_xmax = xmax ;
+    clip_ymax = ymax ;
+  } ;
 
-    // Cohen-Sutherland clipping (2D)
-    this.clipAndDrawLine2D = function (x0, y0, x1, y1) {
-      var outcode0 = computeOutCode2D (x0, y0) ;
-      var outcode1 = computeOutCode2D (x1, y1) ;
-      var accept = false ;
+  // Cohen-Sutherland clipping (2D)
+  this.clipAndDrawLine2D = function (x0, y0, x1, y1) {
+    var outcode0 = computeOutCode2D (x0, y0) ;
+    var outcode1 = computeOutCode2D (x1, y1) ;
+    var accept = false ;
 
-      while (true) {
-        if (!(outcode0 | outcode1)) {
-          accept = true ;
-          break ;
-        } else if (outcode0 & outcode1) {
-          break ;
+    while (true) {
+      if (!(outcode0 | outcode1)) {
+        accept = true ;
+        break ;
+      } else if (outcode0 & outcode1) {
+        break ;
+      } else {
+        var x, y ;
+
+        var outcodeOut = outcode0 ? outcode0 : outcode1 ;
+
+        if (outcodeOut & OUTCODES.TOP) {
+          x = x0 + (x1 - x0) * (clip_ymax - y0) / (y1 - y0) ;
+          y = clip_ymax ;
+        } else if (outcodeOut & OUTCODES.BOTTOM) {
+          x = x0 + (x1 - x0) * (clip_ymin - y0) / (y1 - y0) ;
+          y = clip_ymin ;
+        } else if (outcodeOut & OUTCODES.RIGHT) {
+          y = y0 + (y1 - y0) * (clip_xmax - x0) / (x1 - x0) ;
+          x = clip_xmax ;
+        } else if (outcodeOut & OUTCODES.LEFT) {
+          y = y0 + (y1 - y0) * (clip_xmin - x0) / (x1 - x0) ;
+          x = clip_xmin ;
+        }
+
+        if (outcodeOut === outcode0) {
+          x0 = x ;
+          y0 = y ;
+          outcode0 = computeOutCode2D (x0, y0) ;
         } else {
-          var x, y ;
-
-          var outcodeOut = outcode0 ? outcode0 : outcode1 ;
-
-          if (outcodeOut & OUTCODES.TOP) {
-            x = x0 + (x1 - x0) * (clip_ymax - y0) / (y1 - y0) ;
-            y = clip_ymax ;
-          } else if (outcodeOut & OUTCODES.BOTTOM) {
-            x = x0 + (x1 - x0) * (clip_ymin - y0) / (y1 - y0) ;
-            y = clip_ymin ;
-          } else if (outcodeOut & OUTCODES.RIGHT) {
-            y = y0 + (y1 - y0) * (clip_xmax - x0) / (x1 - x0) ;
-            x = clip_xmax ;
-          } else if (outcodeOut & OUTCODES.LEFT) {
-            y = y0 + (y1 - y0) * (clip_xmin - x0) / (x1 - x0) ;
-            x = clip_xmin ;
-          }
-
-          if (outcodeOut === outcode0) {
-            x0 = x ;
-            y0 = y ;
-            outcode0 = computeOutCode2D (x0, y0) ;
-          } else {
-            x1 = x ;
-            y1 = y ;
-            outcode1 = computeOutCode2D (x1, y1) ;
-          }
+          x1 = x ;
+          y1 = y ;
+          outcode1 = computeOutCode2D (x1, y1) ;
         }
       }
-      if (accept) {
-        clip_graphics.moveTo (x0, y0) ;
-        clip_graphics.lineTo (x1, y1) ;
-      }
-    } ;
+    }
+    if (accept) {
+      clip_graphics.moveTo (x0, y0) ;
+      clip_graphics.lineTo (x1, y1) ;
+    }
+  } ;
+}; // WireframeRender
 
 
-};
-
-
-Smokingmirror.WireframeRender.prototype = {
+WireframeRender.prototype = {
   setViewport: function (x, y, w, h, near, far) {
     this.viewWidth = w ;
     this.viewHeight = h ;
@@ -105,11 +105,11 @@ Smokingmirror.WireframeRender.prototype = {
     this.nearPlane = near ;
     this.farPlane = far ;
 
-    this.projMatrix = new Smokingmirror.Matrix4() ;
+    this.projMatrix = new Matrix4() ;
   },
 
   setViewAsPerpsective: function (fovAngle) {
-    this.projMatrix = Smokingmirror.geometry.generatePerspectiveView (fovAngle,
+    this.projMatrix = Geometry.generatePerspectiveView (fovAngle,
       this.viewWidth, this.viewHeight, this.nearPlane, this.farPlane) ;
   },
 
@@ -118,18 +118,18 @@ Smokingmirror.WireframeRender.prototype = {
     this.viewMatrix.identity() ;
 
     if (typeof (rot) !== 'undefined') {
-      var rotM = new Smokingmirror.Matrix4() ;
+      var rotM = new Matrix4() ;
       rotM.makeRotationFromVector3 (rot) ;
       this.viewMatrix.multiply (rotM) ;
     }
-    
-    var posM = new Smokingmirror.Matrix4() ;
+
+    var posM = new Matrix4() ;
     posM.setPosition (pos) ;
     this.viewMatrix.multiply (posM) ;
 
 
     // calculate inverse
-    var temp = new Smokingmirror.Matrix4() ;
+    var temp = new Matrix4() ;
     temp.copy (this.viewMatrix) ;
     temp.setPosition ({ x: 0, y: 0, z: 0}) ;
     temp.transpose() ;
@@ -149,7 +149,7 @@ Smokingmirror.WireframeRender.prototype = {
     //modelGraphics.lineStyle (4, Math.random() * 0xFFFFFF, 1) ;
     modelGraphics.lineStyle (thickness, 0xFFFFFF, model.alpha) ;
 
-    var lastVert = Smokingmirror.Vector3() ;
+    var lastVert = new Vector3() ;
 
     this.setupClip (modelGraphics, this.viewX, this.viewY, this.viewWidth, this.viewHeight) ;
 
@@ -241,8 +241,6 @@ Smokingmirror.WireframeRender.prototype = {
       } // lines
     } // materials
   },
+}; // WireframeRender.prototype
 
-
-};
-
-Smokingmirror.render = new Smokingmirror.WireframeRender() ;
+module.exports = WireframeRender ;

@@ -1,33 +1,35 @@
-(function(root) {
+var Vector3 = require('./smokingmirror/math/vector3') ;
+var Model = require('./smokingmirror/model') ;
+var Loader = require('./smokingmirror/loader') ;
 
-  root.game.Player = function(defData) {
-    "use strict";
+var Player = function(defData, renderer) {
+  "use strict";
 
-    this.modelDef = root.Smokingmirror.loader.parseWavefront (defData) ;
+  this.modelDef = Loader.parseWavefront (defData) ;
 
-    this.model = new root.Smokingmirror.Model(this.modelDef) ;
+  this.model = new Model(this.modelDef, renderer) ;
 
-    this.model.materials.FlameMat.color = 0xFF4212 ;
-    this.model.materials.FlameMat.alpha = 0.7 ;
-    this.model.materials.BaseMat.color = 0xE0FFFC ;
+  this.model.materials.FlameMat.color = 0xFF4212 ;
+  this.model.materials.FlameMat.alpha = 0.7 ;
+  this.model.materials.BaseMat.color = 0xE0FFFC ;
 
-    this.pos = new root.Smokingmirror.Vector3() ;
-    this.rot = new root.Smokingmirror.Vector3() ;
-  };
+  this.pos = new Vector3() ;
+  this.rot = new Vector3() ;
+};
 
-  root.game.Player.prototype = {
-    
-    update: function() {
-      this.model.position = this.pos ;
-      this.model.rotation = this.rot ;
+Player.prototype = {
 
-      this.model.update() ;
-    },
+  update: function() {
+    this.model.position = this.pos ;
+    this.model.rotation = this.rot ;
 
-    render: function(modelGraphics) {
-      this.model.render(modelGraphics) ;
-    }
+    this.model.update() ;
+  },
 
-  };
+  render: function(modelGraphics) {
+    this.model.render(modelGraphics) ;
+  }
 
-})(typeof window !== "undefined" ? window : this) ;
+};
+
+module.exports = Player ;
