@@ -34,7 +34,7 @@ Game.prototype = {
     var game = this ;
 
     $.when (
-      $.get ('assets/objects/player2.obj', function (data) {
+      $.get ('assets/objects/player3.obj', function (data) {
         playerShipDef = data ;
       })
     ).then (function() {
@@ -153,17 +153,17 @@ Game.prototype = {
 
   setupDebugUI: function() {
     var ObjMenu = function() {
-      this.posX = 0.0 ;
-      this.posY = 0.0 ;
+      this.posX = -1.2 ;
+      this.posY = 0 ;
       this.posZ = -7.0 ;
-      this.rotX = 90 ;
-      this.rotY = 0 ;
+      this.rotX = 147 ;
+      this.rotY = 127 ;
       this.rotZ = 0 ;
     } ;
     var CameraMenu = function () {
       this.posX = 0.0 ;
       this.posY = 0.0 ;
-      this.posZ = 0 ;
+      this.posZ = 5 ;
       this.rotX = 0 ;
       this.rotY = 0 ;
       this.rotZ = 0 ;
@@ -196,6 +196,8 @@ Game.prototype = {
     this.cameraMenu = cameraMenu ;
 
     objFolder.open() ;
+
+    gui.close() ;
 
   },
 
