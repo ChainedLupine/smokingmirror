@@ -27,13 +27,13 @@ var Player = function(defData, renderer) {
 
 Player.prototype = {
 
-  update: function() {
+  update: function(dt) {
     this.model.position = this.pos ;
     this.model.rotation = this.rot ;
 
-    this.animTick += 0.3 ;
+    this.animTick += dt * 10 ;
 
-    this.model.materials.Flame.color = util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
+    //this.model.materials.Flame.color = util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
     this.model.materials.Flame.alpha = 0.7 + (Math.sin (this.animTick) * 0.2) ;
 
 

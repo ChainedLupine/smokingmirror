@@ -4,14 +4,26 @@
 
 var WireframeRender = require ('./smokingmirror/render') ;
 var GlowFilter = require ('./shaders/glowfilter') ;
-var Player = require ('./player') ;
-var Vector3 = require ('./smokingmirror/math/vector3') ;
+var AssetManager = require ('./assets') ;
+var math = require('./smokingmirror/math/misc') ;
+
+var ShooterScene = require('./scenes/shooter') ;
+
+var assetList = {
+  models: {
+    player: 'assets/objects/player3.obj'
+  }
+} ;
 
 var Game = function () {
   this.canvasSettings = { w: 900, h: 600 } ;
   this.PIXIrenderer = null ;
   this.wireframeRender = new WireframeRender() ;
   this.blurScale = 0.9 ;
+
+  this.timeCurrent = Date.now() ;
+  this.timeDelta = 0 ;
+  this.timePrev = this.timeCurrent ;
 } ;
 
 Game.prototype = {
@@ -24,47 +36,51 @@ Game.prototype = {
 
     console.log ("renderType=" + renderType) ;
 
+    this.assetManager = new AssetManager() ;
+
     this.setupPIXI(renderType) ;
 
     this.setupDebugUI() ;
 
     this.setupShaderEffects() ;
 
-    var playerShipDef ;
     var game = this ;
 
-    $.when (
-      $.get ('assets/objects/player3.obj', function (data) {
-        playerShipDef = data ;
-      })
-    ).then (function() {
-      game.player = new Player (playerShipDef, game.wireframeRender) ;
-
-      game.player.update() ;
-
+    this.assetManager.loadAssets (assetList, function() {
+      $('#loader').hide() ;
+      game.startNewScene(new ShooterScene(game)) ;
       game.animate() ;
     }) ;
   },
 
-  animate: function () {
-    this.player.pos.x = this.objMenu.posX ;
-    this.player.pos.y = this.objMenu.posY ;
-    this.player.pos.z = this.objMenu.posZ ;
+  startNewScene: function(scene) {
+    if (typeof (this.currentScene) !== 'undefined' && this.currentScene !== null) {
+      this.currentScene.destroy() ;
+    }
 
-    this.player.rot.x = this.objMenu.rotX * 0.0174533 ;
-    this.player.rot.y = this.objMenu.rotY * 0.0174533 ;
-    this.player.rot.z = this.objMenu.rotZ * 0.0174533 ;
+    console.log ('Switching scene!') ;
+
+    scene.setup() ;
+    this.currentScene = scene ;
+  },
+
+
+
+  animate: function () {
+    // update timedelta
+    this.timeCurrent = Date.now() ;
+    this.timeDelta = ((this.timeCurrent - this.timePrev) / 1000) * this.engineSettings.timeScale ;
+    this.timePrev = this.timeCurrent ;
 
     this.wireframeRender.setCamera(
-      //new Vector3 (0, 0, 0), new Vector3 (0, 0, 0)
-      new Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
-      new Vector3 (this.cameraMenu.rotX * 0.0174533, this.cameraMenu.rotY * 0.0174533, this.cameraMenu.rotZ * 0.0174533)
+      new math.Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
+      new math.Vector3 (this.cameraMenu.rotX * math.DTR, this.cameraMenu.rotY * math.DTR, this.cameraMenu.rotZ * math.DTR)
     ) ;
 
-    this.player.update() ;
+    this.currentScene.update(this.timeDelta) ;
 
     this.modelGraphics.clear() ;
-    this.player.render(this.modelGraphics) ;
+    this.currentScene.render() ;
 
     this.renderTextureBlur.render(this.visualEffectsContainer, null, true);
     this.renderTextureGlow.render(this.visualEffectsContainer, null, true);
@@ -152,14 +168,10 @@ Game.prototype = {
   },
 
   setupDebugUI: function() {
-    var ObjMenu = function() {
-      this.posX = -1.2 ;
-      this.posY = 0 ;
-      this.posZ = -7.0 ;
-      this.rotX = 147 ;
-      this.rotY = 127 ;
-      this.rotZ = 0 ;
+    var EngineSettings = function() {
+      this.timeScale = 1.0 ;
     } ;
+
     var CameraMenu = function () {
       this.posX = 0.0 ;
       this.posY = 0.0 ;
@@ -173,16 +185,11 @@ Game.prototype = {
 
     $("div#debuggui").append (gui.domElement) ;
 
-    var objMenu = new ObjMenu() ;
     var cameraMenu = new CameraMenu() ;
+    var engineSettings = new EngineSettings() ;
 
-    var objFolder = gui.addFolder ("Spaceship") ;
-    objFolder.add(objMenu, 'posX', -10, 10);
-    objFolder.add(objMenu, 'posY', -10, 10);
-    objFolder.add(objMenu, 'posZ', -10, 10);
-    objFolder.add(objMenu, 'rotX', 0, 360);
-    objFolder.add(objMenu, 'rotY', 0, 360);
-    objFolder.add(objMenu, 'rotZ', 0, 360);
+    //var engineFolder = gui.addFolder ("SmokingMirror Engine") ;
+    gui.add(engineSettings, 'timeScale', 0, 2);
 
     var camFolder = gui.addFolder ("Camera") ;
     camFolder.add(cameraMenu, 'posX', -10, 10);
@@ -192,10 +199,11 @@ Game.prototype = {
     camFolder.add(cameraMenu, 'rotY', 0, 360);
     camFolder.add(cameraMenu, 'rotZ', 0, 360);
 
-    this.objMenu = objMenu ;
     this.cameraMenu = cameraMenu ;
+    this.engineSettings = engineSettings ;
 
-    objFolder.open() ;
+    //objFolder.open() ;
+    //engineFolder.open() ;
 
     gui.close() ;
 

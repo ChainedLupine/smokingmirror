@@ -14,6 +14,17 @@
 				top: 10px ;
 				left: 10px ;
 			}
+
+			div#loader {
+				position: absolute ;
+				top: 300px ;
+				left: 300px ;
+				background: #333 ;
+				width: 250px ;
+				height: 50px ;
+				color: #fff ;
+				text-align: center;
+			}
 		</style>
 		<script src="libs/dat.gui/dat.gui.js"></script>
 		<script src="libs/pixi/pixi.js"></script>
@@ -24,6 +35,7 @@
 
 		<div id="game" style="position:relative">
 			<canvas id="main" width="900" height="600" style="cursor: inherit;"></canvas>
+			<div id="loader"><p>Loading...</p></div>
 		</div>
 
 		<div id="debuggui"></div>
