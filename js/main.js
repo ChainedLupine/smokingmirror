@@ -1,3 +1,16 @@
+/* globals dat */
+
+// patch dat.gui
+dat.GUI.prototype.removeFolder = function(name) {
+  var folder = this.__folders[name];
+  if (!folder) {
+    return;
+  }
+  folder.close();
+  this.__ul.removeChild(folder.domElement.parentNode);
+  delete this.__folders[name];
+  this.onResize();
+} ;
 
 
 var smokingmirror = require('./smokingmirror') ;
@@ -7,11 +20,5 @@ var game = new Game() ;
 
 $(document).ready (function() {
   game.init() ;
-
-  console.log (smokingmirror.Math.degToRad (360) / 2) ;
-
-  var vec3 = new smokingmirror.Math.Vector3() ;
-
-  console.log (vec3) ;
 
 });

@@ -240,7 +240,92 @@ WireframeRender.prototype = {
         }
       } // lines
     } // materials
-  },
+  }, // renderModelToGraphics
+
+  renderLinesToGraphics: function (verts, modelGraphics) {
+    var lastVert = new Vector3() ;
+
+    this.setupClip (modelGraphics, this.viewX, this.viewY, this.viewWidth, this.viewHeight) ;
+
+    var near = this.nearPlane ;
+
+    var vX = this.viewX ;
+    var vY = this.viewY ;
+    var vW = this.viewWidth ;
+    var vH = this.viewHeight ;
+    var clipViewport = this.clipToViewport ;
+    var clipFrustrum = this.clipToFrustrum ;
+
+    for (var i = 0; i < (verts.length / 4) - 1; i++) {
+      // lookup vert for this line
+      var firstVertIdx = i * 4 ;
+      var secVertIdx = (i + 1) * 4 ;
+
+      var x1 = verts[firstVertIdx] ;
+      var y1 = verts[firstVertIdx+1] ;
+      var z1 = verts[firstVertIdx+2] ;
+      var w1 = verts[firstVertIdx+3] ;
+
+      var x2 = verts[secVertIdx] ;
+      var y2 = verts[secVertIdx+1] ;
+      var z2 = verts[secVertIdx+2] ;
+      var w2 = verts[secVertIdx+3] ;
+
+      if (clipFrustrum) {
+        // do near-plane clipping if needed
+        if (w1 < near && w2 < near) { // if both are behind, just don't render
+          //modelGraphics.lineStyle (thickness, 0xFF0000, 0.2) ;
+          continue ;
+        }
+
+        if (w1 >= near && w2 < near) { // if v1 is in front, and v2 is behind, clip v2 at intersection w/view plane
+          //modelGraphics.lineStyle (thickness, 0xFFFF00, 0.5) ;
+          var n = (w1 - near) / (w1 - w2) ;
+          var xc = (n * x2) + ((1-n) * x1) ;
+          var yc = (n * y2) + ((1-n) * y1) ;
+          var zc = (n * z2) + ((1-n) * z1) ;
+          var wc = (n * w2) + ((1-n) * w1) ;
+          x2 = xc ;
+          y2 = yc ;
+          z2 = zc ;
+          w2 = wc ;
+        }
+
+        if (w1 < near && w2 >= near) { // if v2 is behind, and v1 is in front, clip v1 at intersection w/view plane
+          //modelGraphics.lineStyle (thickness, 0xFF00FF, 0.5) ;
+          var n2 = (w2 - near) / (w2 - w1) ;
+          var xc2 = (n2 * x1) + ((1-n2) * x2) ;
+          var yc2 = (n2 * y1) + ((1-n2) * y2) ;
+          var zc2 = (n2 * z1) + ((1-n2) * z2) ;
+          var wc2 = (n2 * w1) + ((1-n2) * w2) ;
+          x1 = xc2 ;
+          y1 = yc2 ;
+          z1 = zc2 ;
+          w1 = wc2 ;
+        }
+      }
+
+      // project both vertices
+      var px1 = vX + (x1 * vW) / w1 + vW / 2 ;
+      var py1 = vY + (y1 * vH) / w1 + vH / 2 ;
+
+      var px2 = vX + (x2 * vW) / w2 + vW / 2 ;
+      var py2 = vY + (y2 * vH) / w2 + vH / 2 ;
+
+      //modelGraphics.lineStyle (1, Math.random() * 0xFFFFFF, 1) ;
+      // Finally, do cohen-sutherlane clipping for 2D line segment (if desired)
+      if (clipViewport) {
+        this.clipAndDrawLine2D (
+          px1, py1,
+          px2, py2
+        ) ;
+      } else {
+        modelGraphics.moveTo (px1, py1) ;
+        modelGraphics.lineTo (px2, py2) ;
+      }
+    } // lines
+  }, // renderSeqLinesToGraphics
+
 }; // WireframeRender.prototype
 
 module.exports = WireframeRender ;

@@ -3,6 +3,7 @@ var math = require('../smokingmirror/math/misc') ;
 
 var ShooterScene = function (game) {
   this.game = game ;
+  this.name = 'ShooterScene' ;
 } ;
 
 

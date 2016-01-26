@@ -7,7 +7,9 @@ var GlowFilter = require ('./shaders/glowfilter') ;
 var AssetManager = require ('./assets') ;
 var math = require('./smokingmirror/math/misc') ;
 
-var ShooterScene = require('./scenes/shooter') ;
+var ShooterScene = require('./scenes/shooterscene') ;
+var CurveTesterScene = require('./scenes/tests/curvescene') ;
+var ModelTesterScene = require('./scenes/tests/modelscene') ;
 
 var assetList = {
   models: {
@@ -24,6 +26,13 @@ var Game = function () {
   this.timeCurrent = Date.now() ;
   this.timeDelta = 0 ;
   this.timePrev = this.timeCurrent ;
+
+  this.scenes = [
+    { name: 'ModelTesterScene', source: './scenes/tests/modelscene' },
+    { name: 'CurveTesterScene', source: './scenes/tests/curvescene' }
+  ] ;
+
+  this.sceneClasses = [] ;
 } ;
 
 Game.prototype = {
@@ -46,9 +55,18 @@ Game.prototype = {
 
     var game = this ;
 
+    // initialize scenes
+    for (var i = 0; i < this.scenes.length; i++) {
+      var sceneData = this.scenes[i] ;
+      this[sceneData.name] = require (sceneData.source) ;
+    }
+
     this.assetManager.loadAssets (assetList, function() {
       $('#loader').hide() ;
-      game.startNewScene(new ShooterScene(game)) ;
+      //game.startNewScene(new ShooterScene(game)) ;
+      //game.startNewScene(new CurveTesterScene(game)) ;
+      var sceneName = game.scenes[0].name ;
+      game.startNewScene(new game[sceneName](game)) ;
       game.animate() ;
     }) ;
   },
@@ -58,7 +76,7 @@ Game.prototype = {
       this.currentScene.destroy() ;
     }
 
-    console.log ('Switching scene!') ;
+    console.log ('Switching scene to ' + (typeof(scene.name) !== 'undefined' ? scene.name : 'unknown') + '!') ;
 
     scene.setup() ;
     this.currentScene = scene ;
@@ -170,6 +188,7 @@ Game.prototype = {
   setupDebugUI: function() {
     var EngineSettings = function() {
       this.timeScale = 1.0 ;
+      this.currentScene = 'curveScene' ;
     } ;
 
     var CameraMenu = function () {
@@ -190,6 +209,16 @@ Game.prototype = {
 
     //var engineFolder = gui.addFolder ("SmokingMirror Engine") ;
     gui.add(engineSettings, 'timeScale', 0, 2);
+    var sceneList = [] ;
+    for (var i = 0; i < this.scenes.length; i++) {
+      sceneList.push (this.scenes[i].name) ;
+    }
+
+    var game = this ;
+
+    gui.add(engineSettings, 'currentScene', sceneList).onFinishChange(function(value) {
+      game.startNewScene(new game[value](game)) ;
+    }) ;
 
     var camFolder = gui.addFolder ("Camera") ;
     camFolder.add(cameraMenu, 'posX', -10, 10);
@@ -202,10 +231,9 @@ Game.prototype = {
     this.cameraMenu = cameraMenu ;
     this.engineSettings = engineSettings ;
 
-    //objFolder.open() ;
-    //engineFolder.open() ;
+    //gui.close() ;
 
-    gui.close() ;
+    this.dgui = gui ;
 
   },
 

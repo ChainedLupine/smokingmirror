@@ -33,7 +33,7 @@ Player.prototype = {
 
     this.animTick += dt * 10 ;
 
-    //this.model.materials.Flame.color = util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
+    this.model.materials.Flame.color = util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
     this.model.materials.Flame.alpha = 0.7 + (Math.sin (this.animTick) * 0.2) ;
 
 

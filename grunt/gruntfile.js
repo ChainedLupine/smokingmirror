@@ -73,11 +73,14 @@ module.exports = function (grunt) {
 
     // ***[[ uglify ]] ---------------------------------------------------------
     uglify: {
+      options: {
+        sourceMap: true,
+      },
 			release: {
 				src: [
           '../build/js/slepinyr-bundle.js',
 				],
-				dest: '../build/js/slepinyr-bundle-min.js'
+				dest: '../build/js/slepinyr-bundle.min.js'
 			},
     },
 
@@ -99,8 +102,11 @@ module.exports = function (grunt) {
           cwd: '../libs',
           src: [
             'dat.gui/**/*.js',
+            'dat.gui/**/*.map',
             'pixi/**/*.js',
-            'jquery/**/*.js'
+            'pixi/**/*.map',
+            'jquery/**/*.js',
+            'jquery/**/*.map',
           ],
           dest: '../build/libs',
         }],

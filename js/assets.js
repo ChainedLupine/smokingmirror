@@ -23,7 +23,7 @@ AssetManager.prototype = {
 
     enumAssets (assets, '') ;
 
-    console.log (JSON.stringify (toLoad, 2, 2)) ;
+    //console.log (JSON.stringify (toLoad, 2, 2)) ;
 
     var loaders = [] ;
 
