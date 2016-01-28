@@ -26,7 +26,7 @@ ModelTesterScene.prototype = {
     //this.model.materials.Cockpit.alpha = 0.4 ;
     this.model.materials.Detail.color = 0x333333 ;
 
-
+    this.model.scale = new math.Vector3 (10, 10, 10) ;
 
   },
 
@@ -35,9 +35,7 @@ ModelTesterScene.prototype = {
   },
 
   update: function(dt) {
-    //this.player.pos.x = -0.9 ; // 1.0 * dt ;
-
-    this.model.position.y = -1.5 ;
+    this.model.position.y = -10 ;
     this.model.position.z = -7 ;
 
     this.r += dt * 10 ;

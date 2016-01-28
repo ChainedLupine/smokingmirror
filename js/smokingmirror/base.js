@@ -12,6 +12,8 @@ var Base3d = function(renderer) {
   this.position = new Vector3() ;
   this.scale = new Vector3(1, 1, 1) ;
 
+  this.parent = null ;
+
 } ;
 
 
@@ -29,12 +31,37 @@ Base3d.prototype = {
 
     this.modelMatrix.identity() ;
     this.modelMatrix.multiply (this.renderer.viewMatrixInv) ;
+
+    if (this.parent !== null) {
+      this.modelMatrix.multiply (this.parent.getWorldMatrix()) ;
+    }
+
     this.modelMatrix.multiply (transM) ;
     this.modelMatrix.multiply (rotM) ;
     this.modelMatrix.multiply (scaleM) ;
 
     //console.log (JSON.stringify(model.modelMatrix.elements, 2, 2)) ;
     //model.modelMatrix.identity() ;
+  },
+
+  getWorldMatrix: function() {
+    var worldM = new Matrix4() ;
+    // first, build all of our matrices
+    var scaleM = new Matrix4() ;
+    scaleM.scale (this.scale) ;
+
+    var rotM = new Matrix4() ;
+    rotM.makeRotationFromVector3 (this.rotation) ;
+
+    var transM = new Matrix4() ;
+    transM.makeTranslation (this.position.x, this.position.y, this.position.z) ;
+
+    worldM.multiply (transM) ;
+    worldM.multiply (rotM) ;
+    worldM.multiply (scaleM) ;
+
+    return (worldM) ;
+
   },
 
   update: function() {

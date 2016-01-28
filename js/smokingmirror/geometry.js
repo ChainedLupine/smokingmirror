@@ -19,6 +19,10 @@ var Geometry = {
     return m.makeOrthographic (left, right, top, bottom, near, far) ;
   },
 
+  localToWorld: function (modelMatrix, vertex) {
+    return vertex.applyMatrix4 (modelMatrix) ;
+  },
+
   // take vertices, project by projMatrix and move by modelMatrix then convert to clip space
   generateTransformedVerts: function (projMatrix, modelMatrix, vertices) {
     var combinedM = new Matrix4() ;

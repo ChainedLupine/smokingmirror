@@ -1,5 +1,4 @@
 /* globals Float32Array */
-/* globals console */
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -14,9 +13,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var Vector3 = require ('./vector3') ;
 var misc = require ('./misc') ;
-
 var Matrix4 = function () {
 
   this.elements = new Float32Array( [
@@ -27,7 +24,6 @@ var Matrix4 = function () {
     0, 0, 0, 1
 
   ] );
-
 };
 
 Matrix4.prototype = {
@@ -117,6 +113,7 @@ Matrix4.prototype = {
   extractRotation: (function () {
 
     var v1;
+    var Vector3 = require ('./vector3') ;
 
     return function ( m ) {
 
@@ -266,6 +263,8 @@ Matrix4.prototype = {
 
     return function ( eye, target, up ) {
 
+      var Vector3 = require ('./vector3') ;
+
       if ( x === undefined ) { x = new Vector3(); }
       if ( y === undefined ) { y = new Vector3(); }
       if ( z === undefined ) { z = new Vector3(); }
@@ -379,6 +378,7 @@ Matrix4.prototype = {
   applyToVector3Array: (function () {
 
     var v1;
+    var Vector3 = require ('./vector3') ;
 
     return function ( array, offset, length ) {
 
@@ -403,6 +403,7 @@ Matrix4.prototype = {
   applyToBuffer: (function () {
 
     var v1;
+    var Vector3 = require ('./vector3') ;
 
     return function applyToBuffer( buffer, offset, length ) {
 
@@ -526,6 +527,7 @@ Matrix4.prototype = {
   getPosition: (function () {
 
     var v1;
+    var Vector3 = require ('./vector3') ;
 
     return function () {
 
@@ -749,6 +751,7 @@ Matrix4.prototype = {
   decompose: (function () {
 
     var vector, matrix;
+    var Vector3 = require ('./vector3') ;
 
     return function ( position, quaternion, scale ) {
 

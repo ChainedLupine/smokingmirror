@@ -9,7 +9,9 @@ var math = require('./smokingmirror/math/misc') ;
 
 var ShooterScene = require('./scenes/shooterscene') ;
 var CurveTesterScene = require('./scenes/tests/curvescene') ;
+var FollowTesterScene = require('./scenes/tests/followscene') ;
 var ModelTesterScene = require('./scenes/tests/modelscene') ;
+var HelperTesterScene = require('./scenes/tests/helperscene') ;
 
 var assetList = {
   models: {
@@ -23,13 +25,15 @@ var Game = function () {
   this.wireframeRender = new WireframeRender() ;
   this.blurScale = 0.9 ;
 
-  this.timeCurrent = Date.now() ;
+  this.timeCurrent = null ;
   this.timeDelta = 0 ;
-  this.timePrev = this.timeCurrent ;
+  this.timePrev = null ;
 
   this.scenes = [
+    { name: 'FollowTesterScene', source: './scenes/tests/followscene' },
     { name: 'ModelTesterScene', source: './scenes/tests/modelscene' },
-    { name: 'CurveTesterScene', source: './scenes/tests/curvescene' }
+    { name: 'CurveTesterScene', source: './scenes/tests/curvescene' },
+    { name: 'HelperTesterScene', source: './scenes/tests/helperscene' },
   ] ;
 
   this.sceneClasses = [] ;
@@ -67,7 +71,7 @@ Game.prototype = {
       //game.startNewScene(new CurveTesterScene(game)) ;
       var sceneName = game.scenes[0].name ;
       game.startNewScene(new game[sceneName](game)) ;
-      game.animate() ;
+      requestAnimationFrame (game.animate.bind(game)) ;
     }) ;
   },
 
@@ -84,11 +88,17 @@ Game.prototype = {
 
 
 
-  animate: function () {
+  animate: function (timestamp) {
     // update timedelta
-    this.timeCurrent = Date.now() ;
-    this.timeDelta = ((this.timeCurrent - this.timePrev) / 1000) * this.engineSettings.timeScale ;
-    this.timePrev = this.timeCurrent ;
+    if (!this.timePrev) {
+      this.timePrev = timestamp ;
+    }
+    this.timeDelta = ((timestamp - this.timePrev) / 1000) * this.engineSettings.timeScale ;
+    this.timePrev = timestamp ;
+
+    if (this.timeDelta > /*0.01666*/ 0.1) {
+      this.timeDelta = /*0.01666*/ 0.1 ;
+    }
 
     this.wireframeRender.setCamera(
       new math.Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
@@ -194,7 +204,7 @@ Game.prototype = {
     var CameraMenu = function () {
       this.posX = 0.0 ;
       this.posY = 0.0 ;
-      this.posZ = 5 ;
+      this.posZ = 100 ;
       this.rotX = 0 ;
       this.rotY = 0 ;
       this.rotZ = 0 ;
@@ -221,9 +231,9 @@ Game.prototype = {
     }) ;
 
     var camFolder = gui.addFolder ("Camera") ;
-    camFolder.add(cameraMenu, 'posX', -10, 10);
-    camFolder.add(cameraMenu, 'posY', -10, 10);
-    camFolder.add(cameraMenu, 'posZ', -10, 10);
+    camFolder.add(cameraMenu, 'posX', -1000, 1000);
+    camFolder.add(cameraMenu, 'posY', -1000, 1000);
+    camFolder.add(cameraMenu, 'posZ', -1000, 1000);
     camFolder.add(cameraMenu, 'rotX', 0, 360);
     camFolder.add(cameraMenu, 'rotY', 0, 360);
     camFolder.add(cameraMenu, 'rotZ', 0, 360);

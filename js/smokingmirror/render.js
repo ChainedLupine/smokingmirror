@@ -14,6 +14,7 @@ var WireframeRender = function() {
   // to note about view matrix:  Only orthogonal, no scaling/skewing!
   this.viewMatrix = new Matrix4() ;
   this.viewMatrixInv = new Matrix4() ;
+  this.scale = 100 ;
 
   this.nearPlane = 0 ;
 

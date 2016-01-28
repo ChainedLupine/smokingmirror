@@ -169,11 +169,15 @@ Curve.prototype.regenerateLineSegments = function() {
   return gpoints ;
 } ;
 
-Curve.prototype.update = function (dt) {
+Curve.prototype.checkPoints = function() {
   if (this.dirtyPoints) {
     this.generatedVerts = this.regenerateLineSegments() ;
     this.dirtyPoints = false ;
   }
+} ;
+
+Curve.prototype.update = function (dt) {
+  this.checkPoints() ;
 
   this.applyTransforms () ;
   this.transformedVerts = Geometry.generateTransformedVerts (

@@ -58,6 +58,8 @@ CurveTesterScene.prototype = {
 
     updateCurve() ;
 
+    curve.scale = new math.Vector3 (20, 20, 20) ;
+
     this.curve = curve ;
 
     this.generateCurve() ;
@@ -74,7 +76,7 @@ CurveTesterScene.prototype = {
       var d = i % 2 === 0 ? 1 - Math.sin (this.r2) * 0.2 : 2 + Math.cos (this.r2) * 0.4 ;
       var x = Math.sin (a * math.DTR) * d ;
       var y = Math.cos (a * math.DTR) * d ;
-      var z = i % 2 === 0  ? Math.cos (this.r3) * 1.2 : 0 ;
+      var z = i % 2 === 0  ? Math.cos (this.r3) * 1.2 : -Math.cos (this.r3) * 0.2 ;
       pts.push (x, y, z) ;
     }
 
