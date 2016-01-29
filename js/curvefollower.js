@@ -17,6 +17,8 @@ var CurveFollower = function () {
 
   this.followerUp = new math.Vector3(0, 1, 0) ;
 
+  this.followerRotateOverride = null ;
+
   this.currRot = new math.Quaternion().copy(this.initialRot) ;
   this.r = 0 ;
 };
@@ -95,6 +97,9 @@ CurveFollower.prototype = {
       var lookAt = new math.Matrix4().lookAt (looktarget, oPos, up) ;
 
       quat.setFromRotationMatrix(lookAt) ;
+      if (this.followerRotateOverride !== null) {
+        quat = this.followerRotateOverride (quat, up, looktarget) ;
+      }
 
       this.currRot.slerp (quat, dt * this.rotSpeed) ;
 

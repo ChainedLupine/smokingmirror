@@ -70,6 +70,7 @@ FollowTesterScene.prototype = {
       this.rotLookahead = 4 ;
       this.rotate = true ;
       this.restart = function() { scene.curvefollower.startFollow() ; };
+      this.banking = true ;
     } ;
 
     var curvesettings = new CurveSettings() ;
@@ -92,6 +93,14 @@ FollowTesterScene.prototype = {
       scene.curvefollower.rotLookahead = followersettings.rotLookahead ;
       scene.curvefollower.rotate = followersettings.rotate ;
     } ;
+
+    var followerRotateOverride = function (quat, up) {
+      var spinQ = new math.Quaternion () ;
+      spinQ.setFromAxisAngle (new math.Vector3(0, 0, 1), scene.r3) ;
+      quat.multiply (spinQ) ;
+      return quat ;
+    } ;
+
 
     var folder = this.game.dgui.addFolder ("Curve Params") ;
     folder.add(curvesettings, 'show', false, true).onFinishChange (function(value) {
@@ -149,6 +158,9 @@ FollowTesterScene.prototype = {
     folderFollower.add (followersettings, 'rotLookahead', 1, 10).step(1).onFinishChange(function(){
       updateFollower() ;
     }) ;
+    folderFollower.add (followersettings, 'banking', false, true).onFinishChange(function(v){
+      scene.curvefollower.followerRotateOverride = v ? followerRotateOverride : null ;
+    }) ;
 
     folderFollower.add (followersettings, 'restart') ;
 
@@ -167,6 +179,8 @@ FollowTesterScene.prototype = {
     this.curvefollower.strict = true ;
     this.curvefollower.child = true ;
     this.curvefollower.setupFollower() ;
+
+    this.curvefollower.followerRotateOverride = followerRotateOverride ;
 
 
   },
