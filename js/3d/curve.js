@@ -1,5 +1,5 @@
-var Geometry = require('./smokingmirror/geometry') ;
-var Base = require('./smokingmirror/base') ;
+var Geometry = require('./geometry') ;
+var Base = require('./base') ;
 
 var Curve = function(renderer) {
   Base.call(this, renderer) ;

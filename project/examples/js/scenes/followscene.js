@@ -1,10 +1,3 @@
-var math = require('../../smokingmirror/math') ;
-var Curve = require('../../curve') ;
-var CurveFollower = require('../../curvefollower') ;
-var Model = require('../../smokingmirror/model') ;
-var Loader = require('../../smokingmirror/loader') ;
-var util = require('../../util') ;
-var Helpers = require('../../smokingmirror/helpers') ;
 
 var FollowTesterScene = function (game) {
   this.game = game ;
@@ -15,7 +8,9 @@ var FollowTesterScene = function (game) {
 
   this.pauseTime = 0 ;
 
-  this.quat = new math.Quaternion() ;
+  this.quat = new SmokingMirror.Quaternion() ;
+
+  this.modelGraphics = new PIXI.Graphics() ;
 } ;
 
 
@@ -27,9 +22,11 @@ FollowTesterScene.prototype = {
     this.r = 127 ;
     */
 
-    var modelDef = Loader.parseWavefront (this.game.assetManager.getAsset ('models.player')) ;
+    this.game.addRenderChild (this.modelGraphics) ;
 
-    this.model = new Model(modelDef, this.game.wireframeRender) ;
+    var modelDef = SmokingMirror.ThreeD.Loader.parseWavefront (this.game.assetManager.getAsset ('models.player')) ;
+
+    this.model = new SmokingMirror.ThreeD.Model(modelDef, this.game.wireframeRender) ;
 
     this.model.materials.Flame.color = 0xFF4212 ;
     this.model.materials.Flame.alpha = 0.7 ;
@@ -37,9 +34,9 @@ FollowTesterScene.prototype = {
     this.model.materials.Cockpit.color = 0x318fdf ;//0xd6ecff ;
     //this.model.materials.Cockpit.alpha = 0.4 ;
     this.model.materials.Detail.color = 0x333333 ;
-    this.model.scale = new math.Vector3 (0.1, 0.1, 0.1) ;
+    this.model.scale = new SmokingMirror.Vector3 (0.1, 0.1, 0.1) ;
 
-    var curve = new Curve(this.game.wireframeRender) ;
+    var curve = new SmokingMirror.ThreeD.Curve(this.game.wireframeRender) ;
 
     curve.setPoints ([
       0, 0, 0,
@@ -95,8 +92,8 @@ FollowTesterScene.prototype = {
     } ;
 
     var followerRotateOverride = function (quat, up) {
-      var spinQ = new math.Quaternion () ;
-      spinQ.setFromAxisAngle (new math.Vector3(0, 0, 1), scene.r3) ;
+      var spinQ = new SmokingMirror.Quaternion () ;
+      spinQ.setFromAxisAngle (new SmokingMirror.Vector3(0, 0, 1), scene.r3) ;
       quat.multiply (spinQ) ;
       return quat ;
     } ;
@@ -135,13 +132,13 @@ FollowTesterScene.prototype = {
     folderFollower.add (followersettings, 'followerIsChild', false, true).onFinishChange(function(v){
       if (v) {
         scene.model.parent = scene.curve ;
-        scene.model.scale = new math.Vector3 (0.1, 0.1, 0.1) ;
-        scene.model.position = new math.Vector3 (0, 0, 0) ;
+        scene.model.scale = new SmokingMirror.Vector3 (0.1, 0.1, 0.1) ;
+        scene.model.position = new SmokingMirror.Vector3 (0, 0, 0) ;
         scene.model.applyTransforms() ;
       } else {
         scene.model.parent = null ;
-        scene.model.scale = new math.Vector3 (1, 1, 1) ;
-        scene.model.position = new math.Vector3 (0, 0, 0) ;
+        scene.model.scale = new SmokingMirror.Vector3 (1, 1, 1) ;
+        scene.model.position = new SmokingMirror.Vector3 (0, 0, 0) ;
         scene.model.applyTransforms() ;
       }
       updateFollower() ;
@@ -166,13 +163,13 @@ FollowTesterScene.prototype = {
 
     this.curve = curve ;
 
-    curve.scale = new math.Vector3 (20, 20, 20) ;
+    curve.scale = new SmokingMirror.Vector3 (20, 20, 20) ;
 
     updateCurve() ;
 
     this.generateCurve() ;
 
-    this.curvefollower = new CurveFollower () ;
+    this.curvefollower = new SmokingMirror.ThreeD.CurveFollower () ;
 
     this.curvefollower.follower = this.model ;
     this.curvefollower.curve = this.curve ;
@@ -193,8 +190,8 @@ FollowTesterScene.prototype = {
     for (var i = 0; i < amt; i++) {
       var a = (360 / amt) * i ;
       var d = i % 2 === 0 ? 1 + (1 * this.curvesettings.circle) : 2 ;
-      var x = Math.sin (a * math.DTR) * d ;
-      var y = Math.cos (a * math.DTR) * d ;
+      var x = Math.sin (a * SmokingMirror.Math.DTR) * d ;
+      var y = Math.cos (a * SmokingMirror.Math.DTR) * d ;
       //var z = i % 2 === 0  ? Math.cos (this.r3) * 1.2 : -Math.cos (this.r3) * 0.2 ;
       var z = i % 2 === 0  ? this.curvesettings.zoffset / 2 : -this.curvesettings.zoffset / 2 ;
       //var z = 0 ;
@@ -211,6 +208,8 @@ FollowTesterScene.prototype = {
 
     this.game.dgui.removeFolder ('Curve Params') ;
     this.game.dgui.removeFolder ('Follower Params') ;
+
+    this.game.removeRenderChild (this.modelGraphics) ;
   },
 
   update: function(dt) {
@@ -219,7 +218,7 @@ FollowTesterScene.prototype = {
     this.r2 += dt * 5 ;
     this.r3 += dt * 1 ;
 
-    this.curve.rotation.y = this.r * math.DTR * 0.5 ;
+    this.curve.rotation.y = this.r * SmokingMirror.Math.DTR * 0.5 ;
     //this.curve.rotation.x = this.r * math.DTR * 0.5 ;
 
     //this.curve.scale.x = Math.sin (this.r3) ;
@@ -248,24 +247,26 @@ FollowTesterScene.prototype = {
 
   render: function() {
     //this.player.render(this.game.modelGraphics) ;
+    this.modelGraphics.clear() ;
+
     if (this.curvesettings.show) {
-      this.curve.render(this.game.modelGraphics) ;
+      this.curve.render(this.modelGraphics) ;
     }
 
-    this.model.render(this.game.modelGraphics) ;
+    this.model.render(this.modelGraphics) ;
 
     if (this.curvesettings.showPoints) {
       var verts = this.curve.generatedVerts ;
       for (var i = 0; i < verts.length; i += 3) {
 
         // now extract generated points
-        var point = new math.Vector3 (verts[i], verts[i+1], verts[i+2]);
+        var point = new SmokingMirror.Vector3 (verts[i], verts[i+1], verts[i+2]);
 
         point.applyMatrix4 (this.curve.getWorldMatrix()) ;
 
-        this.game.modelGraphics.lineStyle (4, 0xFF00FF, 1) ;
+        this.modelGraphics.lineStyle (4, 0xFF00FF, 1) ;
 
-        Helpers.renderPoint (this.game.wireframeRender, this.game.modelGraphics, point, 0.1) ;
+        SmokingMirror.ThreeD.Helpers.renderPoint (this.game.wireframeRender, this.modelGraphics, point, 0.1) ;
       }
     }
   }

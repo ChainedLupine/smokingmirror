@@ -1,14 +1,9 @@
-var Vector3 = require('./smokingmirror/math/vector3') ;
-var Model = require('./smokingmirror/model') ;
-var Loader = require('./smokingmirror/loader') ;
-var util = require('./util') ;
-
 var Player = function(defData, renderer) {
   "use strict";
 
-  this.modelDef = Loader.parseWavefront (defData) ;
+  this.modelDef = SmokingMirror.ThreeD.Loader.parseWavefront (defData) ;
 
-  this.model = new Model(this.modelDef, renderer) ;
+  this.model = new SmokingMirror.ThreeD.Model(this.modelDef, renderer) ;
 
   this.model.materials.Flame.color = 0xFF4212 ;
   this.model.materials.Flame.alpha = 0.7 ;
@@ -19,8 +14,8 @@ var Player = function(defData, renderer) {
 
   this.flameHue = (12 * 0.0174533) ;
 
-  this.pos = new Vector3() ;
-  this.rot = new Vector3() ;
+  this.pos = new SmokingMirror.Vector3() ;
+  this.rot = new SmokingMirror.Vector3() ;
 
   this.animTick = 0 ;
 };
@@ -33,7 +28,7 @@ Player.prototype = {
 
     this.animTick += dt * 10 ;
 
-    this.model.materials.Flame.color = util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
+    this.model.materials.Flame.color = SmokingMirror.Util.HSVtoHTML ((this.flameHue + Math.sin (this.animTick) * 0.04) / 6.24, 0.93, 1) ;
     this.model.materials.Flame.alpha = 0.7 + (Math.sin (this.animTick) * 0.2) ;
 
 

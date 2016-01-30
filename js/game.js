@@ -2,41 +2,23 @@
 /* globals dat */
 /* globals requestAnimationFrame */
 
-var WireframeRender = require ('./smokingmirror/render') ;
-var GlowFilter = require ('./shaders/glowfilter') ;
-var AssetManager = require ('./assets') ;
-var math = require('./smokingmirror/math/misc') ;
 
-var ShooterScene = require('./scenes/shooterscene') ;
-var CurveTesterScene = require('./scenes/tests/curvescene') ;
-var FollowTesterScene = require('./scenes/tests/followscene') ;
-var ModelTesterScene = require('./scenes/tests/modelscene') ;
-var HelperTesterScene = require('./scenes/tests/helperscene') ;
-
-var assetList = {
-  models: {
-    player: 'assets/objects/player3.obj'
-  }
-} ;
+var AssetManager = require('./assets') ;
+var WireframeRender = require('./3d/render') ;
+var Vector3 = require('./3d/math/Vector3') ;
+var math = require('./3d/math/misc') ;
 
 var Game = function () {
   this.canvasSettings = { w: 900, h: 600 } ;
   this.PIXIrenderer = null ;
   this.wireframeRender = new WireframeRender() ;
-  this.blurScale = 0.9 ;
 
   this.timeCurrent = null ;
   this.timeDelta = 0 ;
   this.timePrev = null ;
 
-  this.scenes = [
-    { name: 'FollowTesterScene', source: './scenes/tests/followscene' },
-    { name: 'ModelTesterScene', source: './scenes/tests/modelscene' },
-    { name: 'CurveTesterScene', source: './scenes/tests/curvescene' },
-    { name: 'HelperTesterScene', source: './scenes/tests/helperscene' },
-  ] ;
+  this.postAnimate = null ;
 
-  this.sceneClasses = [] ;
 } ;
 
 Game.prototype = {
@@ -55,24 +37,8 @@ Game.prototype = {
 
     this.setupDebugUI() ;
 
-    this.setupShaderEffects() ;
-
     var game = this ;
 
-    // initialize scenes
-    for (var i = 0; i < this.scenes.length; i++) {
-      var sceneData = this.scenes[i] ;
-      this[sceneData.name] = require (sceneData.source) ;
-    }
-
-    this.assetManager.loadAssets (assetList, function() {
-      $('#loader').hide() ;
-      //game.startNewScene(new ShooterScene(game)) ;
-      //game.startNewScene(new CurveTesterScene(game)) ;
-      var sceneName = game.scenes[0].name ;
-      game.startNewScene(new game[sceneName](game)) ;
-      requestAnimationFrame (game.animate.bind(game)) ;
-    }) ;
   },
 
   startNewScene: function(scene) {
@@ -86,7 +52,9 @@ Game.prototype = {
     this.currentScene = scene ;
   },
 
-
+  startLoop: function() {
+    requestAnimationFrame (this.animate.bind(this)) ;
+  },
 
   animate: function (timestamp) {
     // update timedelta
@@ -101,66 +69,22 @@ Game.prototype = {
     }
 
     this.wireframeRender.setCamera(
-      new math.Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
-      new math.Vector3 (this.cameraMenu.rotX * math.DTR, this.cameraMenu.rotY * math.DTR, this.cameraMenu.rotZ * math.DTR)
+      new Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
+      new Vector3 (this.cameraMenu.rotX * math.DTR, this.cameraMenu.rotY * math.DTR, this.cameraMenu.rotZ * math.DTR)
     ) ;
 
     this.currentScene.update(this.timeDelta) ;
 
-    this.modelGraphics.clear() ;
-    this.currentScene.render() ;
+    if (this.postAnimate !== null) {
+      this.postAnimate(this.timeDelta) ;
+    }
 
-    this.renderTextureBlur.render(this.visualEffectsContainer, null, true);
-    this.renderTextureGlow.render(this.visualEffectsContainer, null, true);
+    this.currentScene.render() ;
 
     this.PIXIrenderer.render(this.stage);
 
-    this.blurFilter.blur = 30 * this.blurScale + Math.sin(this.animTick) * 10.0 * this.blurScale ;
-    this.renderSpriteBlur.alpha = 1.0 - (0.7 + Math.abs (Math.sin(this.animTick)) * 0.2) * this.blurScale ;
-
-    this.animTick += 0.03 ;
-
     requestAnimationFrame (this.animate.bind(this)) ;
 
-  },
-
-  setupShaderEffects: function () {
-    // create the root of the scene graph
-    this.renderTextureBlur = new PIXI.RenderTexture(this.PIXIrenderer, this.PIXIrenderer.width, this.PIXIrenderer.height);
-    this.renderTextureGlow = new PIXI.RenderTexture(this.PIXIrenderer, this.PIXIrenderer.width, this.PIXIrenderer.height);
-
-    var mosaicScale = 0.25 ;
-
-    this.renderSpriteBlur = new PIXI.Sprite(this.renderTextureBlur) ;
-    this.renderSpriteBlur.position.x = this.canvasSettings.w / 2 ;
-    this.renderSpriteBlur.position.y = this.canvasSettings.h / 2 ;
-    this.renderSpriteBlur.anchor.set(0.5) ;
-
-
-    this.renderSpriteGlow = new PIXI.Sprite(this.renderTextureGlow) ;
-    this.renderSpriteGlow.position.x = this.canvasSettings.w / 2 ;
-    this.renderSpriteGlow.position.y = this.canvasSettings.h / 2 ;
-    this.renderSpriteGlow.anchor.set(0.5) ;
-
-    this.glowFilter = new GlowFilter();
-
-    this.blurFilter = new PIXI.filters.BlurFilter();
-    this.blurFilter.blur = 50 ;
-
-    this.renderSpriteGlow.filters = [this.glowFilter] ;
-    this.renderSpriteBlur.filters = [this.blurFilter] ;
-    this.renderSpriteBlur.alpha = 0.5 ;
-
-    this.stage.addChild (this.pixelEffectContainer) ;
-
-    this.renderSpriteGlow.blendMode = PIXI.BLEND_MODES.ADD;
-    this.pixelEffectContainer.addChild (this.renderSpriteGlow) ;
-    this.renderSpriteBlur.blendMode = PIXI.BLEND_MODES.OVERLAY;
-    this.pixelEffectContainer.addChild (this.renderSpriteBlur) ;
-
-    var pixelFilter = new PIXI.filters.PixelateFilter() ;
-    pixelFilter.size = { x: 1, y: 1 } ;
-    this.pixelEffectContainer.filters = [pixelFilter] ;
   },
 
   setupPIXI: function(renderType) {
@@ -180,18 +104,6 @@ Game.prototype = {
 
     this.stage = new PIXI.Container() ;
     this.stage.interactive = true;
-
-    this.pixelEffectContainer = new PIXI.Container() ;
-    this.stage.addChild (this.pixelEffectContainer) ;
-
-    this.visualEffectsContainer = new PIXI.Container() ;
-    this.pixelEffectContainer.addChild (this.visualEffectsContainer) ;
-
-    this.animTick = 0 ;
-
-    this.modelGraphics = new PIXI.Graphics() ;
-
-    this.visualEffectsContainer.addChild(this.modelGraphics);
 
   },
 
@@ -217,18 +129,9 @@ Game.prototype = {
     var cameraMenu = new CameraMenu() ;
     var engineSettings = new EngineSettings() ;
 
-    //var engineFolder = gui.addFolder ("SmokingMirror Engine") ;
     gui.add(engineSettings, 'timeScale', 0, 2);
-    var sceneList = [] ;
-    for (var i = 0; i < this.scenes.length; i++) {
-      sceneList.push (this.scenes[i].name) ;
-    }
-
     var game = this ;
 
-    gui.add(engineSettings, 'currentScene', sceneList).onFinishChange(function(value) {
-      game.startNewScene(new game[value](game)) ;
-    }) ;
 
     var camFolder = gui.addFolder ("Camera") ;
     camFolder.add(cameraMenu, 'posX', -1000, 1000);

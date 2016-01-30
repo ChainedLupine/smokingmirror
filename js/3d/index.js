@@ -1,6 +1,4 @@
-var smokingmirror = module.exports = {
-
-  VERSION: "0.99.0",
+var threed = module.exports = {
 
   Math: require ('./math'),
 

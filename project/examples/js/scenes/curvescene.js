@@ -1,6 +1,4 @@
-var Player = require ('../../player') ;
-var math = require('../../smokingmirror/math') ;
-var Curve = require('../../curve') ;
+var Player = require ('../models/player') ;
 
 var CurveTesterScene = function (game) {
   this.game = game ;
@@ -8,6 +6,8 @@ var CurveTesterScene = function (game) {
   this.r = 0 ;
   this.r2 = 0 ;
   this.r3 = 0 ;
+
+  this.modelGraphics = new PIXI.Graphics() ;
 } ;
 
 
@@ -19,7 +19,9 @@ CurveTesterScene.prototype = {
     this.r = 127 ;
     */
 
-    var curve = new Curve(this.game.wireframeRender) ;
+    this.game.addRenderChild (this.modelGraphics) ;
+
+    var curve = new SmokingMirror.ThreeD.Curve(this.game.wireframeRender) ;
 
     curve.setPoints ([
       0, 0, 0,
@@ -58,7 +60,7 @@ CurveTesterScene.prototype = {
 
     updateCurve() ;
 
-    curve.scale = new math.Vector3 (20, 20, 20) ;
+    curve.scale = new SmokingMirror.Vector3 (20, 20, 20) ;
 
     this.curve = curve ;
 
@@ -74,8 +76,8 @@ CurveTesterScene.prototype = {
     for (var i = 0; i < amt; i++) {
       var a = (360 / amt) * i ;
       var d = i % 2 === 0 ? 1 - Math.sin (this.r2) * 0.2 : 2 + Math.cos (this.r2) * 0.4 ;
-      var x = Math.sin (a * math.DTR) * d ;
-      var y = Math.cos (a * math.DTR) * d ;
+      var x = Math.sin (a * SmokingMirror.Math.DTR) * d ;
+      var y = Math.cos (a * SmokingMirror.Math.DTR) * d ;
       var z = i % 2 === 0  ? Math.cos (this.r3) * 1.2 : -Math.cos (this.r3) * 0.2 ;
       pts.push (x, y, z) ;
     }
@@ -88,6 +90,8 @@ CurveTesterScene.prototype = {
     this.curve = null ;
 
     this.game.dgui.removeFolder ('Curve Params') ;
+
+    this.game.removeRenderChild (this.modelGraphics) ;
   },
 
   update: function(dt) {
@@ -98,8 +102,8 @@ CurveTesterScene.prototype = {
     this.r2 += dt * 5 ;
     this.r3 += dt * 1 ;
 
-    this.curve.rotation.y = this.r * math.DTR ;
-    this.curve.rotation.x = this.r * math.DTR * 0.5 ;
+    this.curve.rotation.y = this.r * SmokingMirror.Math.DTR ;
+    this.curve.rotation.x = this.r * SmokingMirror.Math.DTR * 0.5 ;
 
     this.generateCurve() ;
 
@@ -123,7 +127,9 @@ CurveTesterScene.prototype = {
 
   render: function() {
     //this.player.render(this.game.modelGraphics) ;
-    this.curve.render(this.game.modelGraphics) ;
+    this.modelGraphics.clear() ;
+
+    this.curve.render(this.modelGraphics) ;
   }
 
 };

@@ -8,146 +8,109 @@ module.exports = function (grunt) {
   grunt.util.linefeed = '\n';
 
   grunt.initConfig({
-    // ***[[ WEBSERVER ]] ------------------------------------------------------
-    webserver: {
-      website: {
-        port: 8088,
-        docroot: '../build/',
-        websiteRoot: '/',
-        interfaceUrls: [
-        ],
-        filterUrls: [
-          //{ url: '/', projectRoot: true, replace: 'always_fail' }
-        ]
-      }
-    },
+    pkg: require('./package.json'),
+  });
 
-    // ***[[ jshint ]] ---------------------------------------------------------
+  grunt.config.init({
     jshint: {
       options: {
-				curly: true,
-				eqeqeq: true,
-				immed: true,
-				latedef: true,
-				newcap: true,
-				noarg: true,
-				sub: true,
-				undef: true,
-				boss: true,
-				eqnull: true,
-				browser: true,
-				globals: {
-					require: true,
-					define: true,
-					requirejs: true,
-					describe: true,
-					expect: true,
-					it: true,
+        curly: true,
+        eqeqeq: true,
+        immed: true,
+        latedef: true,
+        newcap: true,
+        noarg: true,
+        sub: true,
+        undef: true,
+        boss: true,
+        eqnull: true,
+        browser: true,
+        globals: {
+          require: true,
+          define: true,
+          requirejs: true,
+          describe: true,
+          expect: true,
+          it: true,
           console: true,
           '$': true,
           PIXI: true,
           module: true,
-				},
-				ignores: [
-				],
-				node: false
-			},
-      grunt: [
-				'gruntfile.js',
-			],
-			scripts: [
-				'../js/**/*.js',
-			]
-    },
-
-    // ***[[ browserify ]] -----------------------------------------------------
-    browserify: {
-      release: {
+          SmokingMirror: true,
+        },
+        ignores: [],
+        node: false
+      },
+      grunt: {
+        src:  [
+          'gruntfile.js',
+          'config/*.js'
+        ]
+      },
+      engine:{
         src: [
-          //'../js/**/*.js'
-          '../js/main.js'
-        ],
-        dest: '../build/js/slepinyr-bundle.js'
+          '../js/**/*.js',
+        ]
       }
-    },
+    }, // -jshint
 
-    // ***[[ uglify ]] ---------------------------------------------------------
-    uglify: {
-      options: {
-        sourceMap: true,
-      },
-			release: {
-				src: [
-          '../build/js/slepinyr-bundle.js',
-				],
-				dest: '../build/js/slepinyr-bundle.min.js'
-			},
-    },
-
-    // ***[[ sync ]] -----------------------------------------------------------
-    sync: {
-      assets: {
-        files: [{
-          cwd: '../assets',
-          src: [
-            '**/*.obj',
-          ],
-          dest: '../build/assets',
-        }],
-        //pretend: true,
-        verbose: true
-      },
-      libraries: {
-        files: [{
-          cwd: '../libs',
-          src: [
-            'dat.gui/**/*.js',
-            'dat.gui/**/*.map',
-            'pixi/**/*.js',
-            'pixi/**/*.map',
-            'jquery/**/*.js',
-            'jquery/**/*.map',
-          ],
-          dest: '../build/libs',
-        }],
-        verbose: true
-      },
-      html: {
-        files: [{
-          cwd: '../html',
-          src: [
-            'index.html',
-          ],
-          dest: '../build',
-        }],
-        //pretend: true,
-        verbose: true
-      },
-    },
-
-    // ***[[ watch ]] ----------------------------------------------------------
     watch: {
       grunt: {
-        files: [ 'gruntfile.js' ],
-        tasks: [ 'jshint:grunt' ],
+        files: [
+          'gruntfile.js',
+          'configs/*.js'
+        ],
+        tasks: ['jshint:grunt'],
         options: {
           reload: true
         }
       },
-      scripts: {
-        files: [ '../js/**/*.js' ],
-        tasks: [ 'jshint:scripts', 'browserify', 'uglify', 'sync' ],
-        options: {
-          spawn: false,
-        },
+      engine: {
+        files: ['../js/**/*.js'],
+        tasks: ['jshint:engine', 'browserify:engine', 'uglify:engine'],
       },
-      assets: {
-        files: [ '../assets/**/*.*', '../html/**/*.html' ],
-        tasks: [ 'sync' ],
-      },
-    },
-  });
+    }, // watch
 
+    browserify: {
+      options: {
+        plugin: [
+          [
+            'remapify', [
+              {
+                src: '**/*.js',  // glob for the files to remap
+                expose: 'smokingmirror', // this will expose `__dirname + /client/views/home.js` as `views/home.js`
+                cwd: '../js'  // defaults to process.cwd()
+              }
+            ]
+          ]
+        ]
+      },
+      engine: {
+        src: [
+          '../js/index.js'
+        ],
+        dest: '../build/js/smokingmirror-bundle.js'
+      }
+    },
+
+    uglify: {
+      options: {
+        sourceMap: true,
+      },
+      engine: {
+        src: [
+          '../build/js/smokingmirror-bundle.js',
+        ],
+        dest: '../build/js/smokingmirror-bundle.min.js'
+      },
+    }, // uglify
+
+
+
+  }) ;
+
+  require('./configs/config-examples.js')(grunt) ;
+  require('./configs/config-sleipnyr.js')(grunt) ;
 
   //grunt.loadNpmTasks('webserver') ;
 
@@ -161,6 +124,11 @@ module.exports = function (grunt) {
                           'Creates a web server.',
                           webserver.createWebserver);
 
-  grunt.registerTask('default', ['jshint', 'browserify', 'uglify', 'sync']) ;
+  //grunt.registerTask('default', ['jshint', 'browserify', 'uglify', 'sync']) ;
+  grunt.registerTask('default-jshint', ['jshint:grunt']) ;
+  grunt.registerTask('default-watch', ['watch:grunt']) ;
+  grunt.registerTask('engine-jshint', ['jshint:engine']) ;
+  grunt.registerTask('engine-watch', ['watch:engine']) ;
+  grunt.registerTask('build-engine', ['jshint:engine', 'browserify:engine', 'uglify:engine']) ;
 
 };

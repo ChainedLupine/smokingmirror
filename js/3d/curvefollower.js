@@ -1,4 +1,4 @@
-var math = require('./smokingmirror/math') ;
+var math = require('./math') ;
 
 var CurveFollower = function () {
   this.follower = null ;

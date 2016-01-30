@@ -5,12 +5,14 @@
   "author": "ChainedLupine",
   "devDependencies": {},
   "dependencies": {
+    "browserify": "^13.0.0",
     "grunt": "~0.4.2",
     "grunt-browserify": "^4.0.1",
     "grunt-cli": "~0.1.11",
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-sync": "^0.5.1"
+    "grunt-sync": "^0.5.1",
+    "remapify": "^2.1.0"
   }
 }

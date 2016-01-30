@@ -8,7 +8,6 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var Matrix4 = require('./matrix4') ;
 var misc = require('./misc') ;
 
 var Vector3 = function ( x, y, z ) {
@@ -373,6 +372,8 @@ Vector3.prototype = {
 
 	setFromQuat: (function () {
 
+		var Matrix4 = require('./matrix4') ;
+
 		var matrix;
 
 		return function ( q, order, update ) {
@@ -419,6 +420,8 @@ Vector3.prototype = {
 
 		var matrix;
 
+		var Matrix4 = require('./matrix4') ;
+
 		return function project( camera ) {
 
 			if ( matrix === undefined ) { matrix = new Matrix4(); }
@@ -433,6 +436,8 @@ Vector3.prototype = {
 	unproject: (function () {
 
 		var matrix;
+
+		var Matrix4 = require('./matrix4') ;
 
 		return function unproject( camera ) {
 

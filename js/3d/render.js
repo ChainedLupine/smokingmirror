@@ -134,8 +134,6 @@ WireframeRender.prototype = {
     temp.copy (this.viewMatrix) ;
     temp.setPosition ({ x: 0, y: 0, z: 0}) ;
     temp.transpose() ;
-    //temp.identity() ;
-    //temp.makeRotationFromVector3 (new Smokingmirror.Vector3(0, 0, 45 * 0.0174533)) ;
     var e = this.viewMatrix.elements ;
 
     temp.setPosition ({ x: -e[12], y: -e[13], z: -e[14]}) ;
