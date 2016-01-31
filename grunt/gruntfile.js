@@ -129,6 +129,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default-watch', ['watch:grunt']) ;
   grunt.registerTask('engine-jshint', ['jshint:engine']) ;
   grunt.registerTask('engine-watch', ['watch:engine']) ;
-  grunt.registerTask('build-engine', ['jshint:engine', 'browserify:engine', 'uglify:engine']) ;
+  grunt.registerTask('engine-build', ['jshint:engine', 'browserify:engine', 'uglify:engine']) ;
 
 };

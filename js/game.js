@@ -5,7 +5,7 @@
 
 var AssetManager = require('./assets') ;
 var WireframeRender = require('./3d/render') ;
-var Vector3 = require('./3d/math/Vector3') ;
+var Vector3 = require('./3d/math/vector3') ;
 var math = require('./3d/math/misc') ;
 
 var Game = function () {
