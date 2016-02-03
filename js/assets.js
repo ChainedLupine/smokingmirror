@@ -36,15 +36,28 @@ AssetManager.prototype = {
       };
     } ;
 
+    var loadAsyncImage = function (source) {
+      return $.Deferred (function (task) {
+        var image = new Image();
+        image.onload = function () { task.resolve(image); } ;
+        image.onerror = function () { task.reject(); } ;
+        image.src = source ;
+      }).promise();
+    } ;
+
     var count = toLoad.length ;
 
     while (toLoad.length > 0) {
-      var itemToLoad = toLoad[0] ;
-      var loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)) ;
+      var itemToLoad = toLoad.shift() ;
+      var loader ;
+
+      if (itemToLoad.pathToAsset.match("\\.(obj|txt|json)$")) { // text
+        loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)) ;
+      } if (itemToLoad.pathToAsset.match("\\.(png|jpg)$")) { // image
+        loader = loadAsyncImage (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
+      }
 
       loaders.push (loader) ;
-
-      toLoad = toLoad.shift() ;
     }
 
     $.when.apply ($, loaders).then (function() {

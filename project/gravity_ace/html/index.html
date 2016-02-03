@@ -1,0 +1,44 @@
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Gravity Ace</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
+			div#debuggui {
+				position: absolute ;
+				top: 10px ;
+				left: 10px ;
+			}
+
+			div#loader {
+				position: absolute ;
+				top: 300px ;
+				left: 300px ;
+				background: #333 ;
+				width: 250px ;
+				height: 50px ;
+				color: #fff ;
+				text-align: center;
+			}
+		</style>
+		<script src="libs/dat.gui/dat.gui.min.js"></script>
+		<script src="libs/pixi/pixi.js"></script>
+		<script src="libs/jquery/jquery-2.1.4.min.js"></script>
+    <script src="libs/smokingmirror/smokingmirror-bundle.js"></script>
+		<script src="js/gravity_ace-bundle.js"></script>
+	</head>
+	<body>
+
+		<div id="game" style="position:relative">
+			<canvas id="main" width="900" height="600" style="cursor: inherit;"></canvas>
+			<div id="loader"><p>Loading...</p></div>
+		</div>
+
+		<div id="debuggui"></div>
+  </body>
+</html>

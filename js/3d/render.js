@@ -160,7 +160,7 @@ WireframeRender.prototype = {
     var vW = this.viewWidth ;
     var vH = this.viewHeight ;
     var clipViewport = this.clipToViewport ;
-    var clipFrustrum = this.clipToFrustrum ;
+    var clipFrustum = this.clipToFrustrum ;
 
     var mats = Object.keys(model.def.lines) ;
 
@@ -186,7 +186,7 @@ WireframeRender.prototype = {
         var z2 = verts[secVertIdx+2] ;
         var w2 = verts[secVertIdx+3] ;
 
-        if (clipFrustrum) {
+        if (clipFrustum) {
           // do near-plane clipping if needed
           if (w1 < near && w2 < near) { // if both are behind, just don't render
             //modelGraphics.lineStyle (thickness, 0xFF0000, 0.2) ;
@@ -253,7 +253,7 @@ WireframeRender.prototype = {
     var vW = this.viewWidth ;
     var vH = this.viewHeight ;
     var clipViewport = this.clipToViewport ;
-    var clipFrustrum = this.clipToFrustrum ;
+    var clipFrustum = this.clipToFrustrum ;
 
     for (var i = 0; i < (verts.length / 4) - 1; i++) {
       // lookup vert for this line
@@ -270,7 +270,7 @@ WireframeRender.prototype = {
       var z2 = verts[secVertIdx+2] ;
       var w2 = verts[secVertIdx+3] ;
 
-      if (clipFrustrum) {
+      if (clipFrustum) {
         // do near-plane clipping if needed
         if (w1 < near && w2 < near) { // if both are behind, just don't render
           //modelGraphics.lineStyle (thickness, 0xFF0000, 0.2) ;

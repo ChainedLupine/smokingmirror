@@ -54,6 +54,15 @@ module.exports = function (grunt) {
       }
     }, // -jshint
 
+    clean: {
+      options: {
+        force: true,
+      },
+      engine: [
+        '../build/'
+      ]
+    },
+
     watch: {
       grunt: {
         files: [
@@ -111,6 +120,7 @@ module.exports = function (grunt) {
 
   require('./configs/config-examples.js')(grunt) ;
   require('./configs/config-sleipnyr.js')(grunt) ;
+  require('./configs/config-gravity_ace.js')(grunt) ;
 
   //grunt.loadNpmTasks('webserver') ;
 
@@ -118,6 +128,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint') ;
   grunt.loadNpmTasks('grunt-contrib-uglify') ;
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerMultiTask('webserver',

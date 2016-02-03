@@ -2,9 +2,9 @@ module.exports = function(grunt) {
   grunt.config.merge({
     // ***[[ WEBSERVER ]] ------------------------------------------------------
     webserver: {
-      examples: {
+      gravity_ace: {
         port: 8088,
-        docroot: '../project/examples/build/',
+        docroot: '../project/gravity_ace/build/',
         websiteRoot: '/',
         interfaceUrls: [],
         filterUrls: [
@@ -15,55 +15,58 @@ module.exports = function(grunt) {
 
     // ***[[ clean ]] ----------------------------------------------------------
     clean: {
-      examples: [
-        '../project/examples/build/'
+      gravity_ace: [
+        '../project/gravity-ace/build/'
       ]
     },
 
 
     // ***[[ jshint ]] ---------------------------------------------------------
     jshint: {
-      examples: {
+      gravity_ace: {
         src: [
-          '../project/examples/js/**/*.js',
+          '../project/gravity_ace/js/**/*.js',
         ]
       }
     },
 
     // ***[[ browserify ]] -----------------------------------------------------
     browserify: {
-      examples: {
+      gravity_ace: {
         src: [
-          '../project/examples/js/start.js'
+          '../project/gravity_ace/js/start.js'
         ],
-        dest: '../project/examples/build/js/examples-bundle.js'
+        dest: '../project/gravity_ace/build/js/gravity_ace-bundle.js'
       }
     },
 
     // ***[[ uglify ]] ---------------------------------------------------------
     uglify: {
-      examples: {
+      gravity_ace: {
         src: [
-          '../project/examples/build/js/examples-bundle.js',
+          '../project/gravity_ace/build/js/gravity_ace-bundle.js',
         ],
-        dest: '../project/examples/build/js/examples-bundle.min.js'
+        dest: '../project/gravity_ace/build/js/gravity_ace-bundle.min.js'
       },
     },
 
     // ***[[ sync ]] -----------------------------------------------------------
     sync: {
-      examples_assets: {
+      gravity_ace_assets: {
         files: [{
-          cwd: '../project/examples/assets',
+          cwd: '../project/gravity_ace/assets',
           src: [
             '**/*.obj',
+            '**/*.mp3',
+            '**/*.png',
+            '**/*.jpg',
           ],
-          dest: '../project/examples/build/assets',
+          dest: '../project/gravity_ace/build/assets',
         }],
         //pretend: true,
         verbose: true
       },
-      examples_libraries: {
+      gravity_ace_libraries: {
         files: [{
           cwd: '../libs',
           src: [
@@ -74,28 +77,28 @@ module.exports = function(grunt) {
             'jquery/**/*.js',
             'jquery/**/*.map',
           ],
-          dest: '../project/examples/build/libs',
+          dest: '../project/gravity_ace/build/libs',
         }],
         verbose: true
       },
-      examples_engine: {
+      gravity_ace_engine: {
         files: [{
           cwd: '../build/js',
           src: [
             '*.js',
             '*.map',
           ],
-          dest: '../project/examples/build/libs/smokingmirror',
+          dest: '../project/gravity_ace/build/libs/smokingmirror',
         }],
         verbose: true
       },
-      examples_html: {
+      gravity_ace_html: {
         files: [{
-          cwd: '../project/examples/html',
+          cwd: '../project/gravity_ace/html',
           src: [
             'index.html',
           ],
-          dest: '../project/examples/build',
+          dest: '../project/gravity_ace/build',
         }],
         //pretend: true,
         verbose: true
@@ -104,32 +107,32 @@ module.exports = function(grunt) {
 
     // ***[[ watch ]] ----------------------------------------------------------
     watch: {
-      examples_scripts: {
-        files: ['../project/examples/js/**/*.js'],
-        tasks: ['jshint:examples', 'browserify:examples', 'uglify:examples', 'sync'],
+      gravity_ace_scripts: {
+        files: ['../project/gravity_ace/js/**/*.js'],
+        tasks: ['jshint:gravity_ace', 'browserify:gravity_ace', 'uglify:gravity_ace', 'sync'],
       },
-      examples_assets: {
+      gravity_ace_assets: {
         files: [
-          '../project/examples/assets/**/*.*',
-          '../project/examples/html/**/*.html',
+          '../project/gravity_ace/assets/**/*.*',
+          '../project/gravity_ace/html/**/*.html',
           '../build/js/smokingmirror*.js'
         ],
-        tasks: ['sync:examples_assets', 'sync:examples_libraries', 'sync:examples_engine', 'sync:examples_html'],
+        tasks: ['sync:gravity_ace_assets', 'sync:gravity_ace_libraries', 'sync:gravity_ace_engine', 'sync:gravity_ace_html'],
       },
     }
   }); // grunt.config
 
-  grunt.registerTask('examples-webserver', [
-    'webserver:examples'
+  grunt.registerTask('gravity_ace-webserver', [
+    'webserver:gravity_ace'
   ]) ;
 
-  grunt.registerTask('examples-build', [
-    'default-jshint', 'jshint:engine', 'jshint:examples',
-    'browserify:engine', 'browserify:examples',
-    'sync:examples_assets', 'sync:examples_libraries', 'sync:examples_engine', 'sync:examples_html'
+  grunt.registerTask('gravity_ace-build', [
+    'default-jshint', 'jshint:engine', 'jshint:gravity_ace',
+    'browserify:engine', 'browserify:gravity_ace',
+    'sync:gravity_ace_assets', 'sync:gravity_ace_libraries', 'sync:gravity_ace_engine', 'sync:gravity_ace_html'
   ]) ;
 
-  grunt.registerTask('examples-watch', [
+  grunt.registerTask('gravity_ace-watch', [
     'watch'
   ]) ;
 

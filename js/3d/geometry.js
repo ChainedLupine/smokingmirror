@@ -8,10 +8,12 @@ var Geometry = {
     var aspect = w / h ;
 
     var m = new Matrix4() ;
+    m.makePerspective (fovAngle, aspect, near, far) ;
 
-    return m.makePerspective (fovAngle, aspect, near, far) ;
+    //console.log (JSON.stringify(m.elements, 2, 2)) ;
 
-    //console.log (JSON.stringify(model.projMatrix.elements, 2, 2)) ;
+    return m ;
+
   },
 
   generateOrthoView: function (left, right, top, bottom, near, far) {

@@ -19,6 +19,8 @@ var Game = function () {
 
   this.postAnimate = null ;
 
+  this.usingDebugCamera = false ;
+
 } ;
 
 Game.prototype = {
@@ -68,10 +70,12 @@ Game.prototype = {
       this.timeDelta = /*0.01666*/ 0.1 ;
     }
 
-    this.wireframeRender.setCamera(
-      new Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
-      new Vector3 (this.cameraMenu.rotX * math.DTR, this.cameraMenu.rotY * math.DTR, this.cameraMenu.rotZ * math.DTR)
-    ) ;
+    if (this.usingDebugCamera) {
+      this.wireframeRender.setCamera(
+        new Vector3 (this.cameraMenu.posX, this.cameraMenu.posY, this.cameraMenu.posZ),
+        new Vector3 (this.cameraMenu.rotX * math.DTR, this.cameraMenu.rotY * math.DTR, this.cameraMenu.rotZ * math.DTR)
+      ) ;
+    }
 
     this.currentScene.update(this.timeDelta) ;
 
