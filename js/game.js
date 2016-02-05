@@ -88,7 +88,6 @@ Game.prototype = {
     this.PIXIrenderer.render(this.stage);
 
     requestAnimationFrame (this.animate.bind(this)) ;
-
   },
 
   setupPIXI: function(renderType) {
@@ -133,7 +132,7 @@ Game.prototype = {
     var cameraMenu = new CameraMenu() ;
     var engineSettings = new EngineSettings() ;
 
-    gui.add(engineSettings, 'timeScale', 0, 2);
+    gui.add(engineSettings, 'timeScale', 0, 8);
     var game = this ;
 
 

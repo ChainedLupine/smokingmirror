@@ -14,7 +14,8 @@ var WireframeRender = function() {
   // to note about view matrix:  Only orthogonal, no scaling/skewing!
   this.viewMatrix = new Matrix4() ;
   this.viewMatrixInv = new Matrix4() ;
-  this.scale = 100 ;
+
+  this.first = true ;
 
   this.nearPlane = 0 ;
 
@@ -241,6 +242,19 @@ WireframeRender.prototype = {
     } // materials
   }, // renderModelToGraphics
 
+  // point is transformed Vector4 of xyzw
+  projectPointToScreen: function (point) {
+    var vX = this.viewX ;
+    var vY = this.viewY ;
+    var vW = this.viewWidth ;
+    var vH = this.viewHeight ;
+
+    var x = vX + (point.x * vW) / point.w + vW / 2 ;
+    var y = vY + (point.y * vH) / point.w + vH / 2 ;
+
+    return { x: x, y: y } ;
+  },
+
   renderLinesToGraphics: function (verts, modelGraphics) {
     var lastVert = new Vector3() ;
 
@@ -312,6 +326,21 @@ WireframeRender.prototype = {
       var py2 = vY + (y2 * vH) / w2 + vH / 2 ;
 
       //modelGraphics.lineStyle (1, Math.random() * 0xFFFFFF, 1) ;
+      /*
+      var lc = modelGraphics.lineColor ;
+      var lw = modelGraphics.lineWidth ;
+      var la = modelGraphics.alpha ;
+      modelGraphics.lineStyle (1, 0xFF00FF, 1) ;
+      modelGraphics.drawRect (px1, py1, 2, 2) ;
+      if (this.first) {
+        this.first = false ;
+        this.firstX = px1 ;
+        this.firstY = py1 ;
+      }
+
+      modelGraphics.lineStyle (lw, lc, la) ;
+      */
+
       // Finally, do cohen-sutherlane clipping for 2D line segment (if desired)
       if (clipViewport) {
         this.clipAndDrawLine2D (

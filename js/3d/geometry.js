@@ -1,4 +1,5 @@
 var Matrix4 = require ('./math/matrix4') ;
+var Vector4 = require ('./math/vector4') ;
 
 var Geometry = {
 
@@ -49,6 +50,25 @@ var Geometry = {
     }
 
     return vertsXYZW ;
+  },
+
+  // same as generateTransformedVerts, but operates on assumed empty point
+  // vertex is Vector3
+  // output is Vector4
+  generateTransformed: function (projMatrix, modelMatrix) {
+    var combinedM = new Matrix4() ;
+    combinedM.multiplyMatrices (projMatrix, modelMatrix) ;
+
+    var e = combinedM.elements;
+    var vert = new Vector4() ;
+
+    // we're assuming w=1 here
+    vert.x = (e[ 12 ]) ;
+    vert.y = (e[ 13 ]) ;
+    vert.z = (e[ 14 ]) ;
+    vert.w = (e[ 15 ]) ;
+
+    return vert ;
   },
 
 

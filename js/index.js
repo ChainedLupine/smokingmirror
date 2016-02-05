@@ -30,6 +30,7 @@ var smokingmirror = {
     Loader: require('./3d/loader'),
     Helpers: require('./3d/helpers'),
     Model: require('./3d/model'),
+    Base: require('./3d/base'),
 
     Curve: require('./3d/curve'),
     CurveFollower: require('./3d/curvefollower'),

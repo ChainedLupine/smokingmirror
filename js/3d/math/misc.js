@@ -13,4 +13,9 @@ module.exports = {
 		return Math.max( min, Math.min( max, value ) );
 
 	},
+  clamp01: function ( value ) {
+
+		return Math.max( 0, Math.min( 1, value ) );
+
+	},
 };

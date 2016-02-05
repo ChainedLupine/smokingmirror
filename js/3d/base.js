@@ -1,8 +1,12 @@
 var Matrix4 = require('./math/matrix4') ;
 var Vector3 = require('./math/vector3') ;
+var Vector4 = require('./math/vector4') ;
+var Geometry = require('./geometry') ;
 
 var Base3d = function(renderer) {
-  this.renderer = renderer ;
+  if (typeof renderer !== 'undefined') {
+    this.renderer = renderer ;
+  }
 
   this.alpha = 1.0 ;
   this.lineThickness = 1.0 ;
@@ -66,8 +70,14 @@ Base3d.prototype = {
 
   update: function() {
     this.applyTransforms () ;
+
+    // if no renderer, we're assuming this is a free-standing 3D point
   },
 
+  updateSingular: function() {
+    this.projectedPoint = Geometry.generateTransformed (
+      this.renderer.projMatrix, this.modelMatrix) ;
+  },
 
 } ;
 
