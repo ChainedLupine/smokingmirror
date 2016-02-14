@@ -21,10 +21,12 @@ var Game = function () {
 
   this.usingDebugCamera = false ;
 
+  this.currentScene = null ;
+
 } ;
 
 Game.prototype = {
-  init: function() {
+  init: function(desiredWidth, desiredHeight) {
 
     var renderType = this.getParameterByName('render') ;
     if (renderType === "") {
@@ -35,7 +37,7 @@ Game.prototype = {
 
     this.assetManager = new AssetManager() ;
 
-    this.setupPIXI(renderType) ;
+    this.setupPIXI(renderType, desiredWidth, desiredHeight) ;
 
     this.setupDebugUI() ;
 
@@ -49,9 +51,9 @@ Game.prototype = {
     }
 
     console.log ('Switching scene to ' + (typeof(scene.name) !== 'undefined' ? scene.name : 'unknown') + '!') ;
+    this.currentScene = scene ;
 
     scene.setup() ;
-    this.currentScene = scene ;
   },
 
   startLoop: function() {
@@ -90,7 +92,14 @@ Game.prototype = {
     requestAnimationFrame (this.animate.bind(this)) ;
   },
 
-  setupPIXI: function(renderType) {
+  setupPIXI: function(renderType, desiredWidth, desiredHeight) {
+    this.canvasSettings.desiredWidth = desiredWidth ;
+    this.canvasSettings.desiredHeight = desiredHeight ;
+    this.canvasSettings.ratio = Math.min (window.innerWidth / desiredWidth, window.innerHeight / desiredHeight) ;
+
+    this.canvasSettings.w = desiredWidth * this.canvasSettings.ratio ;
+    this.canvasSettings.h = desiredHeight * this.canvasSettings.ratio ;
+    
     this.wireframeRender.setViewport (0, 0, this.canvasSettings.w, this.canvasSettings.h, 0.1, 1000) ;
     this.wireframeRender.setViewAsPerpsective (90) ;
 
@@ -132,7 +141,7 @@ Game.prototype = {
     var cameraMenu = new CameraMenu() ;
     var engineSettings = new EngineSettings() ;
 
-    gui.add(engineSettings, 'timeScale', 0, 8);
+    gui.add(engineSettings, 'timeScale', 0, 2);
     var game = this ;
 
 

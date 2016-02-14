@@ -143,7 +143,7 @@ game.getEffectsCtr = function () {
 
 $(document).ready (function() {
 
-  game.init() ;
+  game.init(640, 1136) ;
 
   game.toVector_X = function (v) {
     return -this.PIXIrenderer.width / 2 + v ;

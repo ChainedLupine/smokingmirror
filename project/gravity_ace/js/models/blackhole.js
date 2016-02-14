@@ -155,7 +155,6 @@ Lightning.prototype = (function() {
 
 var Blackhole = function (game, blackholeSettings, diameter) {
   "use strict";
-  //SmokingMirror.ThreeD.Base.call(this, game.wireframeRender) ;
   PIXI.Container.call(this) ;
 
   this.diameter = diameter ;
@@ -171,6 +170,7 @@ var Blackhole = function (game, blackholeSettings, diameter) {
   this.eventGlowSpr.scale.y = diameter / glowSprTx.height ;
 
   // displacement sprite
+
   this.displaceSpr = new PIXI.Sprite (blackholeSettings.displaceTxr) ;
   this.displaceFilter = new PIXI.filters.DisplacementFilter(this.displaceSpr) ;
   this.displaceFilter.scale.x = 500 ;
@@ -182,12 +182,8 @@ var Blackhole = function (game, blackholeSettings, diameter) {
   blackholeSettings.blackholeDisplaceCtr.addChild (this.displaceSpr) ;
   blackholeSettings.blackholeGlowCtr.addChild (this.eventGlowSpr) ;
 
-  if (game.getSceneCtr().filters === null) {
-    game.getSceneCtr().filters = [this.displaceFilter] ;
-  } else {
-    game.getSceneCtr().filters = game.getSceneCtr().filters.concat ([this.displaceFilter]) ;
-  }
-  //game.getSceneCtr().filters = null ;
+
+  this.game.currentScene.addBlackholeFilter (this.displaceFilter) ;
 
 
   var curve = new SmokingMirror.ThreeD.Curve(this.game.wireframeRender) ;
@@ -240,8 +236,8 @@ Blackhole.prototype.update = function(dt) {
 
   this.eventGlowSpr.x = this.x - this.diameter / 2 ;
   this.eventGlowSpr.y = this.y - this.diameter / 2 ;
-  this.displaceSpr.x = this.x - this.displaceSpr.width / 2 ;
-  this.displaceSpr.y = this.y - this.displaceSpr.height / 2 ;
+  this.displaceSpr.x = this.x - this.displaceSpr.width / 2; //  - 13 ;
+  this.displaceSpr.y = this.y - this.displaceSpr.height / 2 ; //- 13 ;
 
   this.curve.lineAlpha = SmokingMirror.Math.clamp01 (0.1 + Math.abs (Math.sin (this.anim * 0.3) * 0.2) + this.agitation * 0.6) ;
 
@@ -257,24 +253,32 @@ Blackhole.prototype.update = function(dt) {
   var ld = this.diameter * 0.5 * 0.8 ;
 
   if (this.agitation > 0.1) {
-    this.boltTime -= dt ;
+    if (this.boltTime > 0) {
+      this.boltTime -= dt ;
+    }
+
     if (this.boltTime <= 0) {
       var a = Math.random() * 360 ;
       lx = this.x + Math.cos (a * SmokingMirror.Math.DTR) * ld ;
       ly = this.y + Math.sin (a * SmokingMirror.Math.DTR) * ld ;
       var color = SmokingMirror.Util.HSVtoHTML (((80 - Math.sin (this.anim) * 3.0 - this.agitation * 20.0) * 0.0174533) / 6.24, 0.93, 0.43 + this.agitation * 0.5) ;
       this.bolts.push (new Lightning (lx, ly, a, this.agitation * this.diameter, color)) ;
-      this.boltTime = 0.3 - this.agitation * 0.3 ;
+      this.boltTime = 0.31 - this.agitation * 0.3 ;
     }
   }
 
 
-
-  for (var i = 0; i < this.bolts.length; i++) {
-    var bolt = this.bolts[i] ;
-    bolt.x = this.x + Math.cos (bolt.dir * SmokingMirror.Math.DTR) * ld ;
-    bolt.y = this.y + Math.sin (bolt.dir * SmokingMirror.Math.DTR) * ld ;
-    this.bolts[i].update(dt) ;
+  if (this.bolts.length > 0) {
+    for (var i = this.bolts.length - 1; i >= 0; i--) {
+      var bolt = this.bolts[i] ;
+      if (bolt.active) {
+        bolt.x = this.x + Math.cos (bolt.dir * SmokingMirror.Math.DTR) * ld ;
+        bolt.y = this.y + Math.sin (bolt.dir * SmokingMirror.Math.DTR) * ld ;
+        bolt.update(dt) ;
+      } else {
+        this.bolts.splice (i, 1) ;
+      }
+    }
   }
 
 } ;
@@ -283,10 +287,9 @@ Blackhole.prototype.render = function(graphics) {
   this.curve.lineThickness = 2.3 + Math.sin (this.anim) * 1.8 + this.agitation ;
   this.game.wireframeRender.first = true ;
 
-  //this.curve.render (graphics) ;
   var g = this.blackholeSettings.blackholeGlowGrf ;
   g.beginFill (0x000000, 1) ;
-  g.drawCircle (this.x, this.y, this.diameter * 0.5) ;
+  g.drawCircle (this.x, this.y, this.diameter * 0.4) ;
   g.endFill() ;
   this.curve.render (g) ;
 
@@ -299,16 +302,10 @@ Blackhole.prototype.render = function(graphics) {
 Blackhole.prototype.destroy = function() {
   this.blackholeSettings.blackholeDisplaceCtr.removeChild (this.displaceSpr) ;
   this.blackholeSettings.blackholeGlowCtr.removeChild (this.eventGlowSpr) ;
+  this.blackholeSettings = null ;
 
-  var filters = this.game.getSceneCtr().filters ;
-  var idx = filters.indexOf (this.displaceFilter) ;
-  filters.splice (idx, 1) ;
-  if (filters.length === 0) {
-    // bug in PIXI, must set to null if filters=[]
-    this.game.getSceneCtr().filters = null ;
-  } else {
-    this.game.getSceneCtr().filters = filters ;
-  }
+  this.game.currentScene.removeBlackholeFilter (this.displaceFilter) ;
+
   this.curve = null ;
 } ;
 
