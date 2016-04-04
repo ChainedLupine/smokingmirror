@@ -1,7 +1,9 @@
 
-var FollowTesterScene = function (game) {
+var ThreeDFollowTesterScene = function (game) {
   this.game = game ;
-  this.name = 'CurveTester' ;
+  this.name = '3DCurveTester' ;
+  this.shadersVectrex = require('./shared/shaders_vectrex')(game) ;
+
   this.r = 0 ;
   this.r2 = 0 ;
   this.r3 = 0 ;
@@ -14,15 +16,16 @@ var FollowTesterScene = function (game) {
 } ;
 
 
-FollowTesterScene.prototype = {
+ThreeDFollowTesterScene.prototype = {
   setup: function () {
-    /*
-    this.player = new Player (this.game.assetManager.getAsset ('models.player'), this.game.wireframeRender) ;
-    this.player.update(0) ;
-    this.r = 127 ;
-    */
+    this.shadersVectrex.setup() ;
 
-    this.game.addRenderChild (this.modelGraphics) ;
+    this.shadersVectrex.addRenderChild (this.modelGraphics) ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
 
     var modelDef = SmokingMirror.ThreeD.Loader.parseWavefront (this.game.assetManager.getAsset ('models.player')) ;
 
@@ -31,8 +34,7 @@ FollowTesterScene.prototype = {
     this.model.materials.Flame.color = 0xFF4212 ;
     this.model.materials.Flame.alpha = 0.7 ;
     this.model.materials.Base.color = 0xE0FFFC ;
-    this.model.materials.Cockpit.color = 0x318fdf ;//0xd6ecff ;
-    //this.model.materials.Cockpit.alpha = 0.4 ;
+    this.model.materials.Cockpit.color = 0x318fdf ;
     this.model.materials.Detail.color = 0x333333 ;
     this.model.scale = new SmokingMirror.Vector3 (0.1, 0.1, 0.1) ;
 
@@ -179,6 +181,12 @@ FollowTesterScene.prototype = {
 
     this.curvefollower.followerRotateOverride = followerRotateOverride ;
 
+    $("div#scenetext").empty().append (
+      "<p>We are rendering cardinal splines using the 3D vector engine, along with a 3D object which is following the spline path.</p>" +
+      "<p>Followers can either be children of the spline path (and therefore inherit its transform) or unattached.  Note that " +
+      "speed values will different between a child or unparented follower, because the spline is scaled up.</p>" +
+      "<p>rotLookahead controls how many far ahead the follower will anticipate changes in direction.</p>"
+    ) ;
 
   },
 
@@ -209,7 +217,20 @@ FollowTesterScene.prototype = {
     this.game.dgui.removeFolder ('Curve Params') ;
     this.game.dgui.removeFolder ('Follower Params') ;
 
-    this.game.removeRenderChild (this.modelGraphics) ;
+    this.shadersVectrex.removeRenderChild (this.modelGraphics) ;
+
+    this.shadersVectrex.destroy() ;
+
+    $("div#scenetext").empty() ;
+  },
+
+  resize: function () {
+    this.shadersVectrex.resize() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
   },
 
   update: function(dt) {
@@ -219,11 +240,6 @@ FollowTesterScene.prototype = {
     this.r3 += dt * 1 ;
 
     this.curve.rotation.y = this.r * SmokingMirror.Math.DTR * 0.5 ;
-    //this.curve.rotation.x = this.r * math.DTR * 0.5 ;
-
-    //this.curve.scale.x = Math.sin (this.r3) ;
-    //this.curve.scale.y = Math.sin (this.r3) ;
-    //this.curve.scale.z = Math.sin (this.r3) ;
 
     this.generateCurve() ;
     this.curve.update(dt) ;
@@ -231,22 +247,10 @@ FollowTesterScene.prototype = {
     this.curvefollower.update(dt) ;
 
 
-    /*var quat = new math.Quaternion() ;
-    quat.setFromEuler (new math.Vector3 (this.r * math.DTR, 0, 0)) ;
-    //quat.setFromEuler (new math.Vector3 (0, this.r * math.DTR, 0)) ;
-    //quat.setFromEuler (new math.Vector3 (0, 0, this.r * math.DTR)) ;
-    //quat.setFromAxisAngle (new math.Vector3(1, 0, 0), this.r * math.DTR) ;
-    this.model.rotation.setFromQuat (quat) ;*/
-
-
-
     this.model.update (dt) ;
-
-
   },
 
   render: function() {
-    //this.player.render(this.game.modelGraphics) ;
     this.modelGraphics.clear() ;
 
     if (this.curvesettings.show) {
@@ -273,4 +277,4 @@ FollowTesterScene.prototype = {
 
 };
 
-module.exports = FollowTesterScene ;
+module.exports = ThreeDFollowTesterScene ;

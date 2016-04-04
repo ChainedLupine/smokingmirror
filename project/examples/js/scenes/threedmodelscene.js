@@ -1,6 +1,8 @@
-var ModelTesterScene = function (game) {
+var ThreeDModelTesterScene = function (game) {
   this.game = game ;
-  this.name = 'ModelTesterScene' ;
+  this.name = '3DModelTesterScene' ;
+  this.shadersVectrex = require('./shared/shaders_vectrex')(game) ;
+
   this.r = 127 ;
   this.animTick = 0 ;
   this.flameHue = (12 * 0.0174533) ;
@@ -9,8 +11,15 @@ var ModelTesterScene = function (game) {
 } ;
 
 
-ModelTesterScene.prototype = {
+ThreeDModelTesterScene.prototype = {
   setup: function () {
+    this.shadersVectrex.setup() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
+
 
     var modelDef = SmokingMirror.ThreeD.Loader.parseWavefront (this.game.assetManager.getAsset ('models.player')) ;
 
@@ -25,13 +34,32 @@ ModelTesterScene.prototype = {
 
     this.model.scale = new SmokingMirror.Vector3 (10, 10, 10) ;
 
-    this.game.addRenderChild (this.modelGraphics) ;
+    this.shadersVectrex.addRenderChild (this.modelGraphics) ;
+
+    $("div#scenetext").empty().append (
+      "<p>Smokingmirror supports models rendered by its 3D vector engine.</p>" +
+      "<p>Models are in Alias Wavefront (.obj) format and can contain multiple groups of vertices split into materials.</p>" +
+      "<p>Access to materials is provided so parts of the model can be changed at runtime (such as the flame effect on this ship).</p>"
+    ) ;
 
   },
 
   destroy: function() {
     this.player = null ;
-    this.game.removeRenderChild (this.modelGraphics) ;
+    this.shadersVectrex.removeRenderChild (this.modelGraphics) ;
+
+    this.shadersVectrex.destroy() ;
+
+    $("div#scenetext").empty() ;
+  },
+
+  resize: function () {
+    this.shadersVectrex.resize() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
   },
 
   update: function(dt) {
@@ -61,4 +89,4 @@ ModelTesterScene.prototype = {
 
 };
 
-module.exports = ModelTesterScene ;
+module.exports = ThreeDModelTesterScene ;

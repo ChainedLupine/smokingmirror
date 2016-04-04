@@ -3,9 +3,10 @@ var Blackhole = require('../models/blackhole') ;
 
 var PlayScene = function (game) {
   this.game = game ;
-  this.name = 'PlayScene' ;
+  this.name = 'BlackHoleScene' ;
+  this.shadersVectrex = require('./shared/shaders_vectrex')(game) ;
 
-  this.test = 0 ;
+  this.animTick = 0 ;
 
   this.gameCtr = null ;
   this.blackholeEffectsCtr = null ;
@@ -16,6 +17,13 @@ var PlayScene = function (game) {
 
 PlayScene.prototype = {
   setup: function () {
+    this.shadersVectrex.setup() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, this.game.PIXIrenderer.height),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
+
     this.modelGraphics = new PIXI.Graphics() ;
 
     /*
@@ -31,7 +39,7 @@ PlayScene.prototype = {
     */
 
     this.gameCtr = new PIXI.Container() ;
-    this.game.addRenderChild (this.gameCtr) ;
+    this.shadersVectrex.addRenderChild (this.gameCtr) ;
 
     this.blackholeEffectsCtr = new PIXI.Container() ;
 
@@ -47,7 +55,6 @@ PlayScene.prototype = {
     this.gameCtr.filters = null ;
 
     var starBackgroundTx = new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.star_background"))) ;
-    //var starBackgroundTx = new PIXI.Texture(new PIXI.BaseTexture(game.assetManager.getAsset("images.grid"))) ;
     this.backgroundSpr = new PIXI.extras.TilingSprite(starBackgroundTx, this.game.PIXIrenderer.width, this.game.PIXIrenderer.height) ;
     this.gameCtr.addChild (this.backgroundSpr) ;
 
@@ -56,7 +63,7 @@ PlayScene.prototype = {
     this.blackholesCtr = new PIXI.Container() ;
     this.gameCtr.addChild (this.blackholesCtr) ;
 
-    this.game.addRenderChild (this.blackholeEffectsCtr) ;
+    this.shadersVectrex.addRenderChild (this.blackholeEffectsCtr) ;
 
 
     var displaceTxr = new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.displace"))) ;
@@ -72,24 +79,24 @@ PlayScene.prototype = {
     this.blackholeTest.agitation = 0.1 ;
     this.blackholesCtr.addChild (this.blackholeTest) ;
 
-
-    //var displaceSprTx2 = new PIXI.Texture(new PIXI.BaseTexture(game.assetManager.getAsset("images.displace"))) ;
-    //this.blackholeTest2 = new Blackhole (game, blackholeSettings, 200) ;
-    //this.game.addRenderChild (this.blackholeTest2) ;
-
     this.sceneFolder = this.game.dgui.addFolder ("Blackhole") ;
     this.sceneFolder.add(this.blackholeTest, 'agitation', 0.0, 1.0).step (0.1) ;
 
+    $("div#scenetext").empty().append (
+      "<p>This is a demonstration of mixing the 3D vector line engine with standard 2D PIXI sprites.</p>" +
+      "<p>The black hole is a combination of several PIXI sprites, plus WebGL filter effects, along with a vector curve.</p>" +
+      "<p>The 3D camera height is set to equal the canvas height, therefore there is a 1:1 correspondance to pixel vs vector coordinates.</p>"
+    ) ;
   },
 
   destroy: function() {
     if (this.blackholeTest) {
+      this.blackholesCtr.removeChild (this.blackholeTest) ;
       this.blackholeTest.destroy() ;
     }
-    this.game.removeRenderChild (this.blackholeEffectsCtr) ;
 
-    this.game.removeRenderChild (this.gameCtr) ;
-    this.gameCtr.removeRenderChild (this.black) ;
+    this.shadersVectrex.removeRenderChild (this.blackholeEffectsCtr) ;
+    this.shadersVectrex.removeRenderChild (this.gameCtr) ;
 
     this.game.dgui.removeFolder ("Blackhole") ;
 
@@ -97,43 +104,36 @@ PlayScene.prototype = {
     this.blackholeEffectsCtr = null ;
     this.blackholeDisplaceCtr = null ;
     this.blackholeGlowCtr = null ;
+
+    this.shadersVectrex.destroy() ;
+
+    $("div#scenetext").empty() ;
+  },
+
+  resize: function () {
+    this.backgroundSpr.width = this.game.PIXIrenderer.width ;
+    this.backgroundSpr.height = this.game.PIXIrenderer.height ;
+
+    this.shadersVectrex.resize() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, this.game.PIXIrenderer.height),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
   },
 
   update: function(dt) {
     this.backgroundSpr.tilePosition.x += 30 * dt ;
     this.backgroundSpr.tilePosition.y += 20 * dt ;
 
-
-
     if (this.blackholeTest) {
-      this.blackholeTest.x = this.game.PIXIrenderer.width / 2 + Math.sin (this.test * 2) * 70 ;
-      this.blackholeTest.y = this.game.PIXIrenderer.height / 2 + Math.sin (this.test * 3) * 30 ;
+      this.blackholeTest.x = this.game.PIXIrenderer.width / 2 + Math.sin (this.animTick * 2) * 70 ;
+      this.blackholeTest.y = this.game.PIXIrenderer.height / 2 + Math.sin (this.animTick * 3) * 30 ;
 
       this.blackholeTest.update(dt) ;
     }
 
-    //this.blackholeTest2.x = this.game.PIXIrenderer.width / 2 + Math.sin (this.test * 2) * 450 ;
-    //this.blackholeTest2.y = this.game.PIXIrenderer.height / 2 + Math.cos (this.test * 3) * 90 ;
-
-    //this.blackholeTest2.update(dt) ;
-
-    if (this.test > 1) {
-
-      //this.blackholeTest2.position.x = Math.random() * 300 ;
-      //this.blackholeTest2.position.y = Math.random() * 200 ;
-      //this.test = 0 ;
-    }
-
-    //this.blackholeTest2.update(dt) ;
-
-    this.test += dt ;
-
-    if (this.test > 1 && this.blackholeTest !== null) {
-      //this.blackholesCtr.removeChild (this.blackholeTest) ;
-      //this.blackholeTest.destroy() ;
-      //this.blackholeTest = null ;
-    }
-
+    this.animTick += dt * 0.8 ;
 
   },
 
@@ -144,8 +144,6 @@ PlayScene.prototype = {
     if (this.blackholeTest) {
       this.blackholeTest.render(this.modelGraphics) ;
     }
-
-    //this.blackholeTest2.render(this.modelGraphics) ;
   },
 
   addBlackholeFilter: function (filter) {

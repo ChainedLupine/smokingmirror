@@ -198,13 +198,10 @@ var Blackhole = function (game, blackholeSettings, diameter) {
   this.anim = 0 ;
   this.bolts = [] ;
   this.boltTime = 0 ;
-
 } ;
 
 Blackhole.prototype = Object.create(PIXI.Container.prototype) ;
 Blackhole.prototype.constructor = Blackhole ;
-
-
 
 Blackhole.prototype.generateCurves = function() {
   var pts = [] ;
@@ -236,8 +233,8 @@ Blackhole.prototype.update = function(dt) {
 
   this.eventGlowSpr.x = this.x - this.diameter / 2 ;
   this.eventGlowSpr.y = this.y - this.diameter / 2 ;
-  this.displaceSpr.x = this.x - this.displaceSpr.width / 2; //  - 13 ;
-  this.displaceSpr.y = this.y - this.displaceSpr.height / 2 ; //- 13 ;
+  this.displaceSpr.x = this.x - this.displaceSpr.width / 2;
+  this.displaceSpr.y = this.y - this.displaceSpr.height / 2 ;
 
   this.curve.lineAlpha = SmokingMirror.Math.clamp01 (0.1 + Math.abs (Math.sin (this.anim * 0.3) * 0.2) + this.agitation * 0.6) ;
 
@@ -248,7 +245,6 @@ Blackhole.prototype.update = function(dt) {
   this.curve.update(dt) ;
 
   // add bolts if near death
-
   var lx, ly ;
   var ld = this.diameter * 0.5 * 0.8 ;
 

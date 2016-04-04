@@ -34,6 +34,7 @@ module.exports = function (grunt) {
           it: true,
           console: true,
           '$': true,
+          '_': true,
           PIXI: true,
           module: true,
           SmokingMirror: true,
@@ -119,8 +120,6 @@ module.exports = function (grunt) {
   }) ;
 
   require('./configs/config-examples.js')(grunt) ;
-  require('./configs/config-sleipnyr.js')(grunt) ;
-  require('./configs/config-gravity_ace.js')(grunt) ;
 
   //grunt.loadNpmTasks('webserver') ;
 

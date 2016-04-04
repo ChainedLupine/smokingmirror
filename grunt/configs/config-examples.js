@@ -57,6 +57,9 @@ module.exports = function(grunt) {
           cwd: '../project/examples/assets',
           src: [
             '**/*.obj',
+            '**/*.mp3',
+            '**/*.png',
+            '**/*.jpg',
           ],
           dest: '../project/examples/build/assets',
         }],
@@ -73,6 +76,8 @@ module.exports = function(grunt) {
             'pixi/**/*.map',
             'jquery/**/*.js',
             'jquery/**/*.map',
+            'lodash/**/*.js',
+            'lodash/**/*.map',
           ],
           dest: '../project/examples/build/libs',
         }],

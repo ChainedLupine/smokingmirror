@@ -1,8 +1,9 @@
 var Player = require ('../models/player') ;
 
-var CurveTesterScene = function (game) {
+var ThreeDCurveTesterScene = function (game) {
   this.game = game ;
-  this.name = 'CurveTester' ;
+  this.name = '3DCurveTester' ;
+  this.shadersVectrex = require('./shared/shaders_vectrex')(game) ;
   this.r = 0 ;
   this.r2 = 0 ;
   this.r3 = 0 ;
@@ -11,15 +12,16 @@ var CurveTesterScene = function (game) {
 } ;
 
 
-CurveTesterScene.prototype = {
+ThreeDCurveTesterScene.prototype = {
   setup: function () {
-    /*
-    this.player = new Player (this.game.assetManager.getAsset ('models.player'), this.game.wireframeRender) ;
-    this.player.update(0) ;
-    this.r = 127 ;
-    */
+    this.shadersVectrex.setup() ;
 
-    this.game.addRenderChild (this.modelGraphics) ;
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
+
+    this.shadersVectrex.addRenderChild (this.modelGraphics) ;
 
     var curve = new SmokingMirror.ThreeD.Curve(this.game.wireframeRender) ;
 
@@ -66,6 +68,11 @@ CurveTesterScene.prototype = {
 
     this.generateCurve() ;
 
+    $("div#scenetext").empty().append (
+      "<p>Smokingmirror contains a cardinal splines curve renderer for use with the 3D vector engine.</p>" +
+      "<p>Open and closed curves are supported.</p>"
+    ) ;
+
   },
 
   generateCurve: function() {
@@ -91,13 +98,23 @@ CurveTesterScene.prototype = {
 
     this.game.dgui.removeFolder ('Curve Params') ;
 
-    this.game.removeRenderChild (this.modelGraphics) ;
+    this.shadersVectrex.removeRenderChild (this.modelGraphics) ;
+
+    this.shadersVectrex.destroy() ;
+
+    $("div#scenetext").empty() ;
+  },
+
+  resize: function () {
+    this.shadersVectrex.resize() ;
+
+    this.game.wireframeRender.setCamera(
+      new SmokingMirror.Vector3 (0, 0, 100),
+      new SmokingMirror.Vector3 (0, 0, 0)
+    ) ;
   },
 
   update: function(dt) {
-
-
-
     this.r += dt * 30 ;
     this.r2 += dt * 5 ;
     this.r3 += dt * 1 ;
@@ -108,25 +125,9 @@ CurveTesterScene.prototype = {
     this.generateCurve() ;
 
     this.curve.update(dt) ;
-    /*
-    this.player.pos.x = -0.9 ; // 1.0 * dt ;
-    this.player.pos.y = -1.5 ;
-    this.player.pos.z = -7 ;
-
-    this.r += dt * 10 ;
-
-    this.player.rot.x = 147 * math.DTR ;
-    this.player.rot.y = this.r * math.DTR ;
-    this.player.rot.z = 0 * math.DTR ;
-
-    this.player.update (dt) ;
-    */
-
-
   },
 
   render: function() {
-    //this.player.render(this.game.modelGraphics) ;
     this.modelGraphics.clear() ;
 
     this.curve.render(this.modelGraphics) ;
@@ -134,4 +135,4 @@ CurveTesterScene.prototype = {
 
 };
 
-module.exports = CurveTesterScene ;
+module.exports = ThreeDCurveTesterScene ;
