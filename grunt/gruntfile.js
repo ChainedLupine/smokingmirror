@@ -1,5 +1,7 @@
 /*jslint node: true */
 
+var defaultProjectName = "examples" ;
+
 module.exports = function (grunt) {
   'use strict';
 
@@ -12,7 +14,7 @@ module.exports = function (grunt) {
   });
 
   grunt.config.init({
-    jshint: {
+    base_jshint: {
       options: {
         curly: true,
         eqeqeq: true,
@@ -53,57 +55,58 @@ module.exports = function (grunt) {
           '../js/**/*.js',
         ]
       }
-    }, // -jshint
+    }, // base_jshint
 
-    clean: {
+    base_clean: {
       options: {
         force: true,
       },
       engine: [
         '../build/'
       ]
-    },
+    }, // base_clean
 
-    watch: {
+    base_watch: {
       grunt: {
         files: [
           'gruntfile.js',
           'configs/*.js'
         ],
-        tasks: ['jshint:grunt'],
+        tasks: ['base_jshint:grunt'],
         options: {
           reload: true
         }
       },
       engine: {
         files: ['../js/**/*.js'],
-        tasks: ['jshint:engine', 'browserify:engine', 'uglify:engine'],
+        tasks: ['base_jshint:engine', 'base_browserify:engine', 'base_uglify:engine'],
       },
-    }, // watch
+    }, // base_watch
 
-    browserify: {
+    base_browserify: {
       options: {
         plugin: [
           [
             'remapify', [
               {
-                src: '**/*.js',  // glob for the files to remap
-                expose: 'smokingmirror', // this will expose `__dirname + /client/views/home.js` as `views/home.js`
-                cwd: '../js'  // defaults to process.cwd()
+                src: '**/*.js',
+                expose: 'smokingmirror',
+                cwd: '../js'
               }
             ]
           ]
         ]
       },
+
       engine: {
         src: [
           '../js/index.js'
         ],
         dest: '../build/js/smokingmirror-bundle.js'
       }
-    },
+    }, // base_browserify
 
-    uglify: {
+    base_uglify: {
       options: {
         sourceMap: true,
       },
@@ -113,15 +116,10 @@ module.exports = function (grunt) {
         ],
         dest: '../build/js/smokingmirror-bundle.min.js'
       },
-    }, // uglify
+    }, // base_uglify
+  }) ; // grunt.config.init
 
-
-
-  }) ;
-
-  require('./configs/config-examples.js')(grunt) ;
-
-  //grunt.loadNpmTasks('webserver') ;
+  //require('./configs/config-examples.js')(grunt) ;
 
   grunt.loadNpmTasks('grunt-sync') ;
   grunt.loadNpmTasks('grunt-contrib-jshint') ;
@@ -130,15 +128,222 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-browserify');
 
+  grunt.task.renameTask('clean', 'base_clean') ;
+  grunt.task.renameTask('watch', 'base_watch') ;
+  grunt.task.renameTask('jshint', 'base_jshint') ;
+  grunt.task.renameTask('browserify', 'base_browserify') ;
+  grunt.task.renameTask('uglify', 'base_uglify') ;
+  grunt.task.renameTask('sync', 'base_sync') ;
+
+  grunt.task.registerTask ('build', [
+    'base_clean:engine', 'clean',
+    'base_jshint:engine', 'jshint',
+    'base_browserify:engine', 'browserify',
+    'base_uglify:engine', 'uglify',
+    'sync'
+  ]) ;
+
   grunt.registerMultiTask('webserver',
                           'Creates a web server.',
                           webserver.createWebserver);
 
-  //grunt.registerTask('default', ['jshint', 'browserify', 'uglify', 'sync']) ;
-  grunt.registerTask('default-jshint', ['jshint:grunt']) ;
-  grunt.registerTask('default-watch', ['watch:grunt']) ;
-  grunt.registerTask('engine-jshint', ['jshint:engine']) ;
-  grunt.registerTask('engine-watch', ['watch:engine']) ;
-  grunt.registerTask('engine-build', ['jshint:engine', 'browserify:engine', 'uglify:engine']) ;
+  grunt.registerTask ('host', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.log.writeln ("Creating webserver host for " + projectName.yellow) ;
+    grunt.config.merge ({
+      webserver: {
+        project: {
+          port: 8088,
+          docroot: '../project/' + projectName + '/build/',
+          websiteRoot: '/',
+          interfaceUrls: [],
+          filterUrls: [
+            //{ url: '/', projectRoot: true, replace: 'always_fail' }
+          ]
+        }
+      }
+    }) ; // merge
+
+    grunt.task.run ("webserver:project") ;
+  }) ; // host
+
+  grunt.registerTask ('clean', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_clean: {
+        project: [
+          '../project/' + projectName + '/build/'
+        ]
+      }
+    }) ; // merge base_clean
+
+    grunt.log.writeln ("Cleaning for " + projectName.yellow) ;
+    grunt.task.run ("base_clean:project") ;
+  }) ; // clean
+
+  grunt.registerTask ('jshint', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_jshint: {
+        project: {
+          src: [
+            '../project/' + projectName + '/js/**/*.js',
+          ]
+        }
+      }
+    }) ; // merge base_jshint
+
+    grunt.log.writeln ("Linting for " + projectName.yellow) ;
+    //grunt.task.run ("base_jshint:grunt") ;
+    //grunt.task.run ("base_jshint:engine") ;
+    grunt.task.run ("base_jshint:project") ;
+  }) ; // clean
+
+  grunt.registerTask ('browserify', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_browserify: {
+        project: {
+          src: [
+            '../project/' + projectName + '/js/start.js'
+          ],
+          dest: '../project/' + projectName + '/build/js/' + projectName + '-bundle.js'
+        }
+      }
+    }) ; // merge base_browserify
+
+    grunt.log.writeln ("Browserify for " + projectName.yellow) ;
+    //grunt.task.run ("base_browserify:engine") ;
+    grunt.task.run ("base_browserify:project") ;
+  }) ; // browserify
+
+  grunt.registerTask ('uglify', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_uglify: {
+        project: {
+          src: [
+            '../project/' + projectName + '/build/js/' + projectName + '-bundle.js',
+          ],
+          dest: '../project/' + projectName + '/build/js/' + projectName + '-bundle.min.js'
+        },
+      }
+    }) ; // merge base_uglify
+
+    grunt.log.writeln ("Uglify for " + projectName.yellow) ;
+    grunt.task.run ("base_uglify:project") ;
+  }) ; // uglify
+
+  grunt.registerTask ('sync', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_sync: {
+        project_assets: {
+          files: [{
+            cwd: '../project/' + projectName + '/assets',
+            src: [
+              '**/*.obj',
+              '**/*.mp3',
+              '**/*.png',
+              '**/*.jpg',
+            ],
+            dest: '../project/' + projectName + '/build/assets',
+          }],
+          //pretend: true,
+          verbose: true
+        },
+        project_libraries: {
+          files: [{
+            cwd: '../libs',
+            src: [
+              'dat.gui/**/*.js',
+              'dat.gui/**/*.map',
+              'pixi/**/*.js',
+              'pixi/**/*.map',
+              'jquery/**/*.js',
+              'jquery/**/*.map',
+              'lodash/**/*.js',
+              'lodash/**/*.map',
+            ],
+            dest: '../project/' + projectName + '/build/libs',
+          }],
+          verbose: true
+        },
+        project_engine: {
+          files: [{
+            cwd: '../build/js',
+            src: [
+              '*.js',
+              '*.map',
+            ],
+            dest: '../project/' + projectName + '/build/libs/smokingmirror',
+          }],
+          verbose: true
+        },
+        project_html: {
+          files: [{
+            cwd: '../project/' + projectName + '/html',
+            src: [
+              'index.html',
+            ],
+            dest: '../project/' + projectName + '/build',
+          }],
+          //pretend: true,
+          verbose: true
+        }
+      }
+    }) ; // merge base_sync
+
+    grunt.log.writeln ("Sync for " + projectName.yellow) ;
+    grunt.task.run ("base_sync:project_libraries") ;
+    grunt.task.run ("base_sync:project_engine") ;
+    grunt.task.run ("base_sync:project_assets") ;
+    grunt.task.run ("base_sync:project_html") ;
+  }) ; // sync
+
+  grunt.registerTask ('watch', function (projectName) {
+    if (arguments.length === 0) {
+      projectName = defaultProjectName ;
+    }
+
+    grunt.config.merge ({
+      base_watch: {
+        project_scripts: {
+          files: ['../project/' + projectName + '/js/**/*.js'],
+          tasks: ['jshint:' + projectName, 'browserify:'  + projectName, 'uglify:'  + projectName],
+        },
+        project_assets: {
+          files: [
+            '../project/'  + projectName + '/assets/**/*.*',
+            '../project/' + projectName + '/html/**/*.html',
+            '../build/js/smokingmirror*.js'
+          ],
+          tasks: ['sync' ],
+        },
+      }
+    }) ; // merge base_watch
+
+    grunt.log.writeln ("Watch for " + projectName.yellow) ;
+    grunt.task.run ("base_watch") ;
+  }) ; // watch
+
 
 };

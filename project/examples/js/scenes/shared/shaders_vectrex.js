@@ -14,13 +14,14 @@ module.exports = function (game) {
     shaders.renderTextureBlur.render(sceneCtr, null, true, false);
     shaders.renderTextureGlow.render(sceneCtr, null, true, false);
 
-    shaders.blurFilter.blur = 30 * blurScale + Math.sin(animTick) * 10.0 * blurScale ;
+    shaders.blurFilter.blur = 15 ; //30 * blurScale + Math.sin(animTick) * 10.0 * blurScale ;
     shaders.renderSpriteBlur.alpha = 1.0 - (0.7 + Math.abs (Math.sin(animTick)) * 0.2) * blurScale ;
 
     animTick += 0.1 * dt ;
   }
 
   return {
+
     setup: function() {
       game.stage.addChild (sceneCtr) ;
       game.stage.addChild (pixelEffectsCtr) ;
