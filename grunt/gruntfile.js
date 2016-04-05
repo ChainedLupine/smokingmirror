@@ -265,6 +265,7 @@ module.exports = function (grunt) {
             src: [
               '**/*.obj',
               '**/*.mp3',
+              '**/*.wav',
               '**/*.png',
               '**/*.jpg',
             ],
@@ -286,7 +287,6 @@ module.exports = function (grunt) {
               'lodash/**/*.js',
               'lodash/**/*.map',
               'stats.js/build/**/*.js',
-              'sound.js/**/*.js'
             ],
             dest: '../project/' + projectName + '/build/libs',
           }],

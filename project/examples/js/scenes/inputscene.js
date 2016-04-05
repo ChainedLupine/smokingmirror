@@ -222,7 +222,7 @@ InputManagerScene.prototype = {
       "<p>Multiple states are allowed, so you can define a block of inputs and reference them in one go.<p>" +
        "Such as, enable/disable all inputs at once, or push/pop them as needed, for easy multi-layered control schemes.</p>" +
        "<p>To test the controls, A/W/S/D are initially enabled.  You can also click using the mouse or touch the screen.</p>" +
-       "<p>You can flip to alternative controls, which are Q/W/E/R along with the mouse/touch click.  The mouse coordinates will stop " + 
+       "<p>You can flip to alternative controls, which are Q/W/E/R along with the mouse/touch click.  The mouse coordinates will stop " +
        "updating in the alternative control scheme, as no touch/mouse move is defined.</p>"
     ) ;
   },

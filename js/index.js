@@ -43,6 +43,8 @@ var smokingmirror = {
 
   Input: require('./input'),
 
+  Sound: require('./sound'),
+
 } ;
 
 

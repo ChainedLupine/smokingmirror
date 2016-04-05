@@ -1,3 +1,5 @@
+
+
 var AssetManager = function() {
   this.assetCache = {} ;
 
@@ -6,7 +8,7 @@ var AssetManager = function() {
 
 
 AssetManager.prototype = {
-  loadAssets: function (assets, callback) {
+  loadAssets: function (assets, doneCallback, updateCallback) {
 
     var toLoad = [] ;
 
@@ -28,20 +30,49 @@ AssetManager.prototype = {
     var loaders = [] ;
 
     var cache = this.assetCache ;
+    var loadCount = 0 ;
 
     var loadProcessor = function (itemToLoad) {
       return function (data) {
         console.log ('AssetManager: Loaded key ' + itemToLoad.name ) ;
         cache[itemToLoad.name] = data ;
+        loadCount++ ;
+        if (updateCallback) {
+          updateCallback (loadCount, loaders.length) ;
+        }
       };
     } ;
 
     var loadAsyncImage = function (source) {
       return $.Deferred (function (task) {
+        console.log ('AssetManager: Loading image ' + source) ;
         var image = new Image();
         image.onload = function () { task.resolve(image); } ;
         image.onerror = function () { task.reject(); } ;
         image.src = source ;
+      }).promise();
+    } ;
+
+    var loadAsyncSound = function (source) {
+      return $.Deferred (function (task) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', source, true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onload = function(e) {
+          if (this.status === 200) {
+            console.log ('AssetManager: Decoding ' + source) ;
+            var newSound = SmokingMirror.Sound.SoundManager.engine.makeSound (source, function () {
+              task.resolve (newSound) ;
+            }, false, xhr) ;
+          } else {
+            task.reject() ;
+          }
+        };
+
+        xhr.onerror = function() { task.reject() ; } ;
+
+        xhr.send();
       }).promise();
     } ;
 
@@ -55,14 +86,20 @@ AssetManager.prototype = {
         loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)) ;
       } if (itemToLoad.pathToAsset.match("\\.(png|jpg)$")) { // image
         loader = loadAsyncImage (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
+      } if (itemToLoad.pathToAsset.match("\\.(wav|mp3)$")) { // sound
+        loader = loadAsyncSound (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
       }
 
       loaders.push (loader) ;
     }
 
+    if (updateCallback) {
+      updateCallback (0, loaders.length) ;
+    }
+
     $.when.apply ($, loaders).then (function() {
       console.log ('AssetLoader: All ' + count + ' items loaded') ;
-      callback() ;
+      doneCallback() ;
     }) ;
 
   },

@@ -1,7 +1,7 @@
 /* globals SmokingMirror */
 
 var game = new SmokingMirror.Game() ;
-var defaultScene = 'Input Manager' ;
+var defaultScene = 'Sounds' ;
 
 var assetList = {
   images: {
@@ -18,7 +18,15 @@ var assetList = {
   },
   models: {
     player: 'assets/objects/player3.obj'
-  }
+  },
+  sounds: {
+    music: 'assets/sounds/musicingame.mp3',
+    enemy_hit: 'assets/sounds/EnemyHit.wav',
+    engine_loop: 'assets/sounds/EngineBetterLooped1.wav',
+    machinegun: 'assets/sounds/MachineGunBetter.wav',
+    reward: 'assets/sounds/RewardGet.wav',
+    small_explosion: 'assets/sounds/SmallExplosion.wav',
+  },
 } ;
 
 var scenes = {} ;
@@ -34,6 +42,8 @@ function loadAssetsAndStart () {
     var scene = _.find (scenes.list, { name: sceneName }) ;
     game.startNewScene(new scene.source(game)) ;
     game.startLoop() ;
+  }, function (loaded, max) {
+    $('#loader p').text("Loaded " + loaded + " of " + max) ;
   }) ;
 }
 
@@ -45,6 +55,7 @@ function setupScenes() {
     { name: '3D Helpers', source: require('./scenes/threedhelperscene') },
     { name: 'Blackhole', source: require('./scenes/blackholescene') },
     { name: 'Input Manager', source: require('./scenes/inputscene') },
+    { name: 'Sounds', source: require('./scenes/soundscene') },
   ] ;
 
   scenes.classes = {} ;

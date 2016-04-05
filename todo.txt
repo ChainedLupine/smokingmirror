@@ -1,18 +1,13 @@
-+ [done] input event system
-  + [done] Keyboard
-  + [done] Mouse
-  + [done] push/pop state, so can easily take/relinquish control
-  + [done] ability to convert client coords of mouse to local canvas coords
-  + [done] partial support for touch
-
 + Physics
   + matter.js for 2d
   + cannon.js for 3d
 
 + vector text
 
-+ Sound
-  + sound.js
++ [done] Sound
+  + [done] sound.js
+  + [done] sound asset loading
+  + sound manager (for global volume)
 
 + tilemaps
   + loading from Tiled
@@ -34,3 +29,15 @@
     + shooting game with top-down perspective
       + control example spaceship
       + shoot the old-style spaceships
+
+
+--- DONE ---
+
++ [done] input event system
+  + [done] Keyboard
+  + [done] Mouse
+  + [done] push/pop state, so can easily take/relinquish control
+  + [done] ability to convert client coords of mouse to local canvas coords
+  + [done] partial support for touch
+
++ [done] display progress on loading
