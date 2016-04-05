@@ -81,8 +81,9 @@ PlayScene.prototype = {
 
     this.sceneFolder = this.game.dgui.addFolder ("Blackhole") ;
     this.sceneFolder.add(this.blackholeTest, 'agitation', 0.0, 1.0).step (0.1) ;
+    this.sceneFolder.open() ;
 
-    $("div#scenetext").empty().append (
+    this.game.sceneSetHelpText(
       "<p>This is a demonstration of mixing the 3D vector line engine with standard 2D PIXI sprites.</p>" +
       "<p>The black hole is a combination of several PIXI sprites, plus WebGL filter effects, along with a vector curve.</p>" +
       "<p>The 3D camera height is set to equal the canvas height, therefore there is a 1:1 correspondance to pixel vs vector coordinates.</p>"
@@ -107,7 +108,7 @@ PlayScene.prototype = {
 
     this.shadersVectrex.destroy() ;
 
-    $("div#scenetext").empty() ;
+    this.game.sceneSetHelpText() ;
   },
 
   resize: function () {

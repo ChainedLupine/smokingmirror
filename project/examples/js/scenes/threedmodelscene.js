@@ -36,7 +36,7 @@ ThreeDModelTesterScene.prototype = {
 
     this.shadersVectrex.addRenderChild (this.modelGraphics) ;
 
-    $("div#scenetext").empty().append (
+    this.game.sceneSetHelpText(
       "<p>Smokingmirror supports models rendered by its 3D vector engine.</p>" +
       "<p>Models are in Alias Wavefront (.obj) format and can contain multiple groups of vertices split into materials.</p>" +
       "<p>Access to materials is provided so parts of the model can be changed at runtime (such as the flame effect on this ship).</p>"
@@ -50,7 +50,7 @@ ThreeDModelTesterScene.prototype = {
 
     this.shadersVectrex.destroy() ;
 
-    $("div#scenetext").empty() ;
+    this.game.sceneSetHelpText() ;
   },
 
   resize: function () {

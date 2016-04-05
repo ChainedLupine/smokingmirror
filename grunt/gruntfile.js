@@ -67,12 +67,15 @@ module.exports = function (grunt) {
     }, // base_clean
 
     base_watch: {
+      options: {
+        livereload: true,
+      },
       grunt: {
         files: [
           'gruntfile.js',
           'configs/*.js'
         ],
-        tasks: ['base_jshint:grunt'],
+        tasks: ['base_jshint:grunt', 'watch'],
         options: {
           reload: true
         }
@@ -282,6 +285,7 @@ module.exports = function (grunt) {
               'jquery/**/*.map',
               'lodash/**/*.js',
               'lodash/**/*.map',
+              'stats.js/build/**/*.js',
             ],
             dest: '../project/' + projectName + '/build/libs',
           }],
@@ -344,6 +348,8 @@ module.exports = function (grunt) {
     grunt.log.writeln ("Watch for " + projectName.yellow) ;
     grunt.task.run ("base_watch") ;
   }) ; // watch
+
+  //grunt.log.writeln ("loaded " + process.argv) ;
 
 
 };

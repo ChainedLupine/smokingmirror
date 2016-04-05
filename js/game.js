@@ -1,12 +1,14 @@
 /* globals alert */
 /* globals dat */
 /* globals requestAnimationFrame */
+/* globals Stats */
 
 
 var AssetManager = require('./assets') ;
 var WireframeRender = require('./3d/render') ;
 var Vector3 = require('./3d/math/vector3') ;
 var math = require('./3d/math/misc') ;
+
 
 var Game = function () {
   this.canvasSettings = { w: 900, h: 600 } ;
@@ -17,11 +19,14 @@ var Game = function () {
   this.timeDelta = 0 ;
   this.timePrev = null ;
 
+  this.stats = null ;
+
   this.postAnimate = null ;
 
   this.usingDebugCamera = false ;
 
   this.currentScene = null ;
+  this.debugFlags = { ALL: 0xffff, UI: 0x1, FPS: 0x2 } ;
 
 } ;
 
@@ -79,6 +84,11 @@ Game.prototype = {
   },
 
   animate: function (timestamp) {
+
+    if (this.stats !== null) {
+      this.stats.begin() ;
+    }
+
     // update timedelta
     if (!this.timePrev) {
       this.timePrev = timestamp ;
@@ -107,6 +117,10 @@ Game.prototype = {
 
     this.PIXIrenderer.render(this.stage);
 
+    if (this.stats !== null) {
+      this.stats.end() ;
+    }
+
     requestAnimationFrame (this.animate.bind(this)) ;
   },
 
@@ -115,13 +129,14 @@ Game.prototype = {
     this.canvasSettings.desiredHeight = desiredHeight ;
     this.canvasSettings.ratio = Math.min (window.innerWidth / desiredWidth, (window.innerHeight - 5) / desiredHeight) ;
 
-    this.canvasSettings.w = desiredWidth * this.canvasSettings.ratio ;
-    this.canvasSettings.h = desiredHeight * this.canvasSettings.ratio ;
+    this.canvasSettings.w = Math.floor (desiredWidth * this.canvasSettings.ratio) ;
+    this.canvasSettings.h = Math.floor (desiredHeight * this.canvasSettings.ratio) ;
 
-    console.log (window.innerHeight, this.canvasSettings.h) ;
+    this.canvasSettings.x = (window.innerWidth / 2 - this.canvasSettings.w / 2) ;
+    this.canvasSettings.y = ((window.innerHeight - 5) / 2 - this.canvasSettings.h / 2) ;
 
-    $("div#game").css({ top: ((window.innerHeight - 5) / 2 - this.canvasSettings.h / 2) + "px" });
-    $("canvas#main").css({ left: (window.innerWidth / 2 - this.canvasSettings.w / 2) + "px" });
+    $("div#game").css({ top: this.canvasSettings.y + "px" });
+    $("canvas#main").css({ left: this.canvasSettings.x + "px" });
   },
 
   setupPIXI: function(renderType, desiredWidth, desiredHeight) {
@@ -195,6 +210,36 @@ Game.prototype = {
 
   },
 
+  enableDebug: function (system) {
+    var flags = 0 ;
+    if (typeof system === "undefined") {
+      flags = this.debugFlags.ALL ;
+    }
+
+    if (system & this.debugFlags.UI) {
+      $("div#debuggui").show() ;
+    }
+
+    if (system & this.debugFlags.FPS) {
+      this.stats = new Stats() ;
+      this.stats.setMode(0) ;
+
+      this.stats.domElement.style.position = 'absolute';
+      this.stats.domElement.style.right = '20px';
+      this.stats.domElement.style.bottom = '10px';
+
+      document.body.appendChild (this.stats.domElement) ;
+    }
+
+  },
+
+  enableLivereload: function (port) {
+    //<script src="//localhost:35729/livereload.js"></script>
+    port = typeof port !== 'undefined' ? port : 35729 ;
+    $.getScript("//localhost:" + port + "/livereload.js") ;
+
+  },
+
   getParameterByName: function (name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -218,6 +263,13 @@ Game.prototype = {
     return this.PIXIrenderer.height / 2 + v ;
   },
 
+  toCanvasFromMouse_X: function (x) {
+    return x - this.canvasSettings.x ;
+  },
+
+  toCanvasFromMouse_Y: function (y) {
+    return y - this.canvasSettings.y ;
+  },
 
 };
 

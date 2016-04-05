@@ -127,6 +127,8 @@ ThreeDFollowTesterScene.prototype = {
       updateCurve() ;
     }) ;
 
+    folder.open() ;
+
     var folderFollower = this.game.dgui.addFolder ("Follower Params") ;
     folderFollower.add (followersettings, 'snapToStart').onFinishChange(function(){
       updateFollower() ;
@@ -162,6 +164,7 @@ ThreeDFollowTesterScene.prototype = {
     }) ;
 
     folderFollower.add (followersettings, 'restart') ;
+    folderFollower.open() ;
 
     this.curve = curve ;
 
@@ -181,7 +184,7 @@ ThreeDFollowTesterScene.prototype = {
 
     this.curvefollower.followerRotateOverride = followerRotateOverride ;
 
-    $("div#scenetext").empty().append (
+    this.game.sceneSetHelpText(
       "<p>We are rendering cardinal splines using the 3D vector engine, along with a 3D object which is following the spline path.</p>" +
       "<p>Followers can either be children of the spline path (and therefore inherit its transform) or unattached.  Note that " +
       "speed values will different between a child or unparented follower, because the spline is scaled up.</p>" +
@@ -221,7 +224,7 @@ ThreeDFollowTesterScene.prototype = {
 
     this.shadersVectrex.destroy() ;
 
-    $("div#scenetext").empty() ;
+    this.game.sceneSetHelpText() ;
   },
 
   resize: function () {

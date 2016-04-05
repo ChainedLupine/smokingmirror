@@ -1,17 +1,18 @@
 /* globals dat */
 
-// patch dat.gui
-dat.GUI.prototype.removeFolder = function(name) {
-  var folder = this.__folders[name];
-  if (!folder) {
-    return;
-  }
-  folder.close();
-  this.__ul.removeChild(folder.domElement.parentNode);
-  delete this.__folders[name];
-  this.onResize();
-} ;
-
+// monkeypatch for dat.gui to add removeFolder
+if (typeof dat !== "undefined" && typeof dat.GUI !== "undefined") {
+  dat.GUI.prototype.removeFolder = function(name) {
+    var folder = this.__folders[name];
+    if (!folder) {
+      return;
+    }
+    folder.close();
+    this.__ul.removeChild(folder.domElement.parentNode);
+    delete this.__folders[name];
+    this.onResize();
+  } ;
+}
 
 var smokingmirror = {
   Math: require('./3d/math/misc'),
@@ -38,7 +39,9 @@ var smokingmirror = {
 
   Shaders: {
     GlowFilter: require('./shaders/glowfilter')
-  }
+  },
+
+  Input: require('./input'),
 
 } ;
 

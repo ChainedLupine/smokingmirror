@@ -18,12 +18,16 @@ ThreeDHelperTesterScene.prototype = {
     ) ;
 
     this.shadersVectrex.addRenderChild (this.modelGraphics) ;
+
+    this.game.sceneSetHelpText("Helper functions for vector library.") ;
   },
 
   destroy: function() {
     this.shadersVectrex.removeRenderChild (this.modelGraphics) ;
 
     this.shadersVectrex.destroy() ;
+
+    this.game.sceneSetHelpText() ;
   },
 
   resize: function () {

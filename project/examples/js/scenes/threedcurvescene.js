@@ -60,6 +60,8 @@ ThreeDCurveTesterScene.prototype = {
       updateCurve() ;
     }) ;
 
+    folder.open() ;
+
     updateCurve() ;
 
     curve.scale = new SmokingMirror.Vector3 (20, 20, 20) ;
@@ -68,7 +70,7 @@ ThreeDCurveTesterScene.prototype = {
 
     this.generateCurve() ;
 
-    $("div#scenetext").empty().append (
+    this.game.sceneSetHelpText(
       "<p>Smokingmirror contains a cardinal splines curve renderer for use with the 3D vector engine.</p>" +
       "<p>Open and closed curves are supported.</p>"
     ) ;
@@ -102,7 +104,7 @@ ThreeDCurveTesterScene.prototype = {
 
     this.shadersVectrex.destroy() ;
 
-    $("div#scenetext").empty() ;
+    this.game.sceneSetHelpText() ;
   },
 
   resize: function () {

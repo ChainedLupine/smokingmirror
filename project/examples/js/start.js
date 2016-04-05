@@ -1,13 +1,19 @@
 /* globals SmokingMirror */
 
 var game = new SmokingMirror.Game() ;
-var defaultScene = 'Blackhole' ;
+var defaultScene = 'Input Manager' ;
 
 var assetList = {
   images: {
     star_background: 'assets/images/star_background.png',
     displace: 'assets/images/displace.png',
     grid: 'assets/images/grid.png',
+    mine: 'assets/images/mine.png',
+    crystals: 'assets/images/crystals.png',
+    test_box: 'assets/images/test-box.png',
+    pirates: 'assets/images/pirateattack.png',
+    vpilot: 'assets/images/portrait-vpilot.png',
+    trashcan: 'assets/images/trashcan-scaled.png',
     eventhorizon_glow: 'assets/images/eventhorizon_glow.png',
   },
   models: {
@@ -20,7 +26,9 @@ var scenes = {} ;
 function loadAssetsAndStart () {
   game.assetManager.loadAssets (assetList, function() {
     $('#loader').hide() ;
-    $("div#debuggui").show() ;
+
+    game.enableDebug (game.debugFlags.ALL) ;
+    game.enableLivereload() ;
 
     var sceneName = defaultScene ;
     var scene = _.find (scenes.list, { name: sceneName }) ;
@@ -36,8 +44,8 @@ function setupScenes() {
     { name: '3D Curve', source: require('./scenes/threedcurvescene') },
     { name: '3D Helpers', source: require('./scenes/threedhelperscene') },
     { name: 'Blackhole', source: require('./scenes/blackholescene') },
+    { name: 'Input Manager', source: require('./scenes/inputscene') },
   ] ;
-
 
   scenes.classes = {} ;
 
@@ -63,12 +71,22 @@ function setupScenes() {
 
 }
 
+function createSceneHelpers() {
+  game.sceneSetHelpText = function (text) {
+    var div = $("div#scenetext").empty() ;
 
+    if (typeof (text) !== "undefined") {
+        div.append (text) ;
+    }
+  } ;
+
+}
 
 $(document).ready (function() {
 
   game.init(1136, 640) ;
 
+  createSceneHelpers() ;
   setupScenes() ;
   loadAssetsAndStart() ;
 
