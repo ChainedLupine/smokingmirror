@@ -286,6 +286,7 @@ module.exports = function (grunt) {
               'lodash/**/*.js',
               'lodash/**/*.map',
               'stats.js/build/**/*.js',
+              'sound.js/**/*.js'
             ],
             dest: '../project/' + projectName + '/build/libs',
           }],
