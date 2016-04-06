@@ -183,6 +183,24 @@ var SoundEngine = function () {
   */
   this.actx = new AudioContext();
 
+  this.masterVolumeNode = this.actx.createGain() ;
+  this.musicVolumeNode = this.actx.createGain() ;
+
+  this.musicVolumeNode.connect (this.masterVolumeNode) ;
+  this.masterVolumeNode.connect (this.actx.destination) ;
+
+  Object.defineProperties(this, {
+    masterVolume: {
+      set: function (v) {
+        this.masterVolumeNode.gain.value = v ;
+      }
+    },
+    musicVolume: {
+      set: function (v) {
+        this.musicVolumeNode.gain.value = v ;
+      }
+    }
+  }) ;
 } ;
 
 
@@ -304,8 +322,20 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
   o.reverbImpulse = null;
 
   //The sound object's methods.
-  o.play = function(onEnded) {
+  o.play = function(asMusic, onEnded) {
 
+    if (typeof asMusic === 'undefined' ? false : asMusic) {
+      if (o.soundNode !== null) {
+        o.pause() ;
+        o.startOffset = 0;
+        o.soundNode = null ;
+
+        // clear any fades
+        o.volumeNode.gain.cancelScheduledValues(0) ;
+        o.volumeNode.gain.value = o.volumeValue ;
+        return ;
+      }
+    }
     //Set the start time (it will be `0` when the sound
     //first starts.
     o.startTime = actx.currentTime;
@@ -313,7 +343,7 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     //Create a sound node.
     o.soundNode = actx.createBufferSource();
     o.soundNode.onended = onEnded ;
-    
+
     //Set the sound node's buffer property to the loaded sound.
     o.soundNode.buffer = o.buffer;
 
@@ -325,9 +355,11 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     o.delayNode.disconnect() ;
     o.feedbackNode.disconnect() ;
 
+    o.soundNode.connect(o.volumeNode) ;
+
     //Connect the sound to the pan, connect the pan to the
     //volume, and connect the volume to the destination.
-    o.soundNode.connect(o.volumeNode);
+    //o.soundNode.connect(o.volumeNode);
 
     //If there's no reverb, bypass the convolverNode
     if (o.reverb === false) {
@@ -341,7 +373,12 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     }
 
     //Connect the `panNode` to the destination to complete the chain.
-    o.panNode.connect(actx.destination);
+    //o.panNode.connect(actx.destination);
+    if (typeof asMusic === 'undefined' ? false : asMusic) {
+      o.panNode.connect (engine.musicVolumeNode) ;
+    } else {
+      o.panNode.connect (engine.masterVolumeNode) ;
+    }
 
     //Add optional echo.
     if (o.echo) {

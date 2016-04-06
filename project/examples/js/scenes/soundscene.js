@@ -33,6 +33,7 @@ SoundScene.prototype = {
 
     this.sceneFolder = this.game.dgui.addFolder ("Sounds") ;
     this.sceneFolder.add(SmokingMirror.Sound.SoundManager, 'masterVolume', 0.0, 1.0).step (0.1) ;
+    this.sceneFolder.add(SmokingMirror.Sound.SoundManager, 'musicVolume', 0.0, 1.0).step (0.1) ;
     this.sceneFolder.add(this, 'soundSpeed', 0.1, 2).step (0.1) ;
     this.sceneFolder.add(this, 'reverb') ;
     this.sceneFolder.add(this, 'echo') ;
@@ -50,7 +51,7 @@ SoundScene.prototype = {
     var sndPlay = function (snd) {
       snd.playbackRate = scene.soundSpeed ;
       if (scene.reverb) {
-        snd.setReverb (2, 2, false) ;
+        snd.setReverb (1, 2, false) ;
       } else {
         snd.clearReverb() ;
       }
@@ -59,7 +60,6 @@ SoundScene.prototype = {
       } else {
         snd.clearEcho() ;
       }
-
 
       SmokingMirror.Sound.SoundManager.play (snd) ;
     } ;
@@ -81,7 +81,11 @@ SoundScene.prototype = {
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_M, function () {
-      sndPlay (music) ;
+      SmokingMirror.Sound.SoundManager.playMusic (music) ;
+    }) ;
+
+    SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_F, function () {
+      music.fadeOut (2.0) ;
     }) ;
 
     SmokingMirror.Input.InputManager.end() ;
