@@ -304,7 +304,7 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
   o.reverbImpulse = null;
 
   //The sound object's methods.
-  o.play = function() {
+  o.play = function(onEnded) {
 
     //Set the start time (it will be `0` when the sound
     //first starts.
@@ -312,12 +312,18 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
 
     //Create a sound node.
     o.soundNode = actx.createBufferSource();
-
+    o.soundNode.onended = onEnded ;
+    
     //Set the sound node's buffer property to the loaded sound.
     o.soundNode.buffer = o.buffer;
 
     //Set the playback rate
     o.soundNode.playbackRate.value = this.playbackRate;
+
+    // disconnect nodes to reset reverb and echo effects
+    o.volumeNode.disconnect() ;
+    o.delayNode.disconnect() ;
+    o.feedbackNode.disconnect() ;
 
     //Connect the sound to the pan, connect the pan to the
     //volume, and connect the volume to the destination.
@@ -326,11 +332,9 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     //If there's no reverb, bypass the convolverNode
     if (o.reverb === false) {
       o.volumeNode.connect(o.panNode);
-    }
-
-    //If there is reverb, connect the `convolverNode` and apply
-    //the impulse response
-    else {
+    } else {
+      //If there is reverb, connect the `convolverNode` and apply
+      //the impulse response
       o.volumeNode.connect(o.convolverNode);
       o.convolverNode.connect(o.panNode);
       o.convolverNode.buffer = o.reverbImpulse;
@@ -416,6 +420,10 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     o.echo = true;
   };
 
+  o.clearEcho = function () {
+    o.echo = false ;
+  } ;
+
   o.setReverb = function(duration, decay, reverse) {
     if (duration === undefined) { duration = 2; }
     if (decay === undefined) { decay = 2; }
@@ -423,6 +431,12 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     o.reverbImpulse = engine.impulseResponse(duration, decay, reverse, actx);
     o.reverb = true;
   };
+
+  o.clearReverb = function() {
+    o.reverb = false ;
+    o.reverbImpulse = null ;
+    o.convolverNode.disconnect() ;
+  } ;
 
   //A general purpose `fade` method for fading sounds in or out.
   //The first argument is the volume that the sound should

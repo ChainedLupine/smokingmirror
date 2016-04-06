@@ -2,7 +2,7 @@ module.exports = function (game) {
 
   var boxWidth = 426 ;
   var boxHeight = 240 ;
-  var boxCtr = new PIXI.Container() ;
+  var boxCtr ;
   var demoText ;
 
   var textStyle = {
@@ -38,6 +38,7 @@ module.exports = function (game) {
   return {
     setup: function (text) {
 
+      boxCtr = new PIXI.Container() ;
       game.stage.addChild (boxCtr) ;
       scaleBoxContainer() ;
 
@@ -48,16 +49,18 @@ module.exports = function (game) {
       temp.alpha = 0.1 ;
 
       demoText = createDemoText (text) ;
-      boxCtr.addChild (demoText) ;
+      boxCtr.addChild (demoText) ; 
 
       return boxCtr ;
     },
 
-
+    boxWidth: boxWidth,
+    boxHeight: boxHeight,
 
     destroy: function () {
       boxCtr.removeChild (demoText) ;
-      game.stage.addChild (boxCtr) ;
+      game.stage.removeChild (boxCtr) ;
+      boxCtr = null ;
     },
 
     resize: function () {

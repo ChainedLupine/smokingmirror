@@ -2,6 +2,8 @@
 var InputManagerScene = function (game) {
   this.game = game ;
   this.name = 'Input Manager Scene' ;
+  this.scenehelpers = require('./shared/scenehelper')(game) ;
+
 } ;
 
 var iconWidth = 426 ;
@@ -43,16 +45,8 @@ InputManagerScene.prototype = {
     this.gridSpr.alpha = 0.2 ;
     this.game.stage.addChild (this.gridSpr) ;
 
-    this.iconCtr = new PIXI.Container() ;
-    this.game.stage.addChild (this.iconCtr) ;
-
-    this.iconCtr.addChild (this.mouseText) ;
-
-    var temp = new PIXI.Sprite(
-      new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.test_box")))
-    ) ;
-    this.iconCtr.addChild (temp) ;
-    temp.alpha = 0.1 ;
+    var boxCtr = this.scenehelpers.setup("Input Example") ;
+    boxCtr.addChild (this.mouseText) ;
 
     var spacing = (iconWidth - 50) / 4 ;
 
@@ -76,12 +70,10 @@ InputManagerScene.prototype = {
     icons.push (createSprite ("images.vpilot", 3)) ;
     this.icons = icons ;
 
-    this.iconCtr.addChild (icons[0]) ;
-    this.iconCtr.addChild (icons[1]) ;
-    this.iconCtr.addChild (icons[2]) ;
-    this.iconCtr.addChild (icons[3]) ;
-
-    this.scaleIconContainer() ;
+    boxCtr.addChild (icons[0]) ;
+    boxCtr.addChild (icons[1]) ;
+    boxCtr.addChild (icons[2]) ;
+    boxCtr.addChild (icons[3]) ;
 
     // define controls
 
@@ -196,8 +188,6 @@ InputManagerScene.prototype = {
       for (var i = 0; i < scene.icons.length; i++ ) { scene.icons[i].alpha = 0 ; }
     } ;
 
-
-
     this.enable = true ;
     this.sceneFolder = this.game.dgui.addFolder ("Input Manager") ;
     var enableOption = this.sceneFolder.add(this, "enable").listen() ;
@@ -230,7 +220,7 @@ InputManagerScene.prototype = {
   destroy: function() {
     SmokingMirror.Input.InputManager.clear() ;
 
-    this.game.stage.removeChild (this.iconCtr) ;
+    this.scenehelpers.destroy() ;
 
     this.game.stage.removeChild (this.gridSpr) ;
     this.gridSpr = null ;
@@ -239,6 +229,8 @@ InputManagerScene.prototype = {
 
     this.game.sceneSetHelpText() ;
 
+    this.scenehelpers = null ;
+
     PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.LINEAR ;
   },
 
@@ -246,11 +238,7 @@ InputManagerScene.prototype = {
     this.gridSpr.width = this.game.PIXIrenderer.width ;
     this.gridSpr.height = this.game.PIXIrenderer.height ;
 
-    this.scaleIconContainer() ;
-
-    /*if (this.game.PIXIrenderer.type === PIXI.RENDERER_TYPE.CANVAS) {
-      this.game.PIXIrenderer.context[this.game.PIXIrenderer.smoothProperty] = false ;
-    }*/
+    this.scenehelpers.resize() ;
   },
 
   scaleIconContainer: function () {

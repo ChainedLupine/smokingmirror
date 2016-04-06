@@ -26,6 +26,7 @@ var assetList = {
     machinegun: 'assets/sounds/MachineGunBetter.wav',
     reward: 'assets/sounds/RewardGet.wav',
     small_explosion: 'assets/sounds/SmallExplosion.wav',
+    blip_select: 'assets/sounds/Blip_Select.wav',
   },
 } ;
 

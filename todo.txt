@@ -4,11 +4,6 @@
 
 + vector text
 
-+ [done] Sound
-  + [done] sound.js
-  + [done] sound asset loading
-  + sound manager (for global volume)
-
 + tilemaps
   + loading from Tiled
   + matter.js integration
@@ -41,3 +36,11 @@
   + [done] partial support for touch
 
 + [done] display progress on loading
+
++ [done] Sound
+  + [done] sound.js
+  + [done] sound asset loading
+  + [done] sound manager (for global volume)
+    + play registers the sound
+    + onended removes from register
+    + update to adjust volume on all play sounds
