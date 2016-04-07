@@ -4,15 +4,34 @@
 
 + vector text
 
-+ tilemaps
-  + loading from Tiled
-  + matter.js integration
++ Basic scenegraph
+  + nested groups of objects
+    + supports Base3d and Base2d objects
+    + update/render calls
+
++ AnimatedSprite
+  + allow multiple animations per sprite
+  + can use a spritesheet or just an array of textures
+  + get type of anim playing
+  + stopAnim/playAnim
+  + resetAnim/gotoFrame
+  + events on end of anim
+  + loop setting, per animation
+  + global speed (in frames/sec)
+  + per animation speed (if none, defaults to global speed)
+
++ TileMap
+  + loading from Tiled .tmx or json
+  + matter.js hull integration
 
 + In-game UI
 
 + debug 3D camera control
   + lets you override scene camera and steer it around using mouse
     + pushes control scheme and generates its own
+
++ pathfinding system
+  + general *star solver for any dimensions
 
 + examples
   + [done] sound example
