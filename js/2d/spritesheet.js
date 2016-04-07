@@ -1,7 +1,13 @@
 
 
 var SpriteSheet = function (sheetJSON, sheetImage, format) {
-  var json = JSON.parse (sheetJSON) ;
+  var json ;
+
+  if (typeof (sheetJSON) !== "object") {
+    json = JSON.parse (sheetJSON) ;
+  } else {
+    json = sheetJSON ;
+  }
 
   var spriteSheetTx = new PIXI.BaseTexture(sheetImage) ;
 

@@ -15,7 +15,6 @@ var assetList = {
     vpilot: 'assets/images/portrait-vpilot.png',
     trashcan: 'assets/images/trashcan-scaled.png',
     eventhorizon_glow: 'assets/images/eventhorizon_glow.png',
-    powerups_iconic: 'assets/images/powerups-iconic.png',
   },
   models: {
     player: 'assets/objects/player3.obj',
@@ -48,7 +47,7 @@ function loadAssetsAndStart () {
     $('#loader').hide() ;
 
     game.enableDebug (game.debugFlags.ALL) ;
-    game.enableLivereload() ;
+    //game.enableLivereload() ;
 
     var sceneName = defaultScene ;
     var scene = _.find (scenes.list, { name: sceneName }) ;

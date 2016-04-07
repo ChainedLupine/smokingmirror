@@ -19,12 +19,16 @@
   + [done] keyboard/mouse system
   + [done] spritesheet example
   + vector example
-  + 2d Sprite system demo
   + ingame UI
   + 3d mini-game
     + shooting game with top-down perspective
       + control example spaceship
       + shoot the old-style spaceships
+  + 2d mini-game
+    + platformer (of course)
+    + simple movement controls
+    + one enemy
+    + tilemap level
 
 
 --- DONE ---
@@ -45,6 +49,4 @@
   + [done] sound.js
   + [done] sound asset loading
   + [done] sound manager (for global volume)
-    + play registers the sound
-    + onended removes from register
-    + update to adjust volume on all play sounds
+    + [done] add music volume
