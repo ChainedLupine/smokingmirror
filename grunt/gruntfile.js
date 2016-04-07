@@ -268,6 +268,7 @@ module.exports = function (grunt) {
               '**/*.wav',
               '**/*.png',
               '**/*.jpg',
+              '**/*.json',
             ],
             dest: '../project/' + projectName + '/build/assets',
           }],

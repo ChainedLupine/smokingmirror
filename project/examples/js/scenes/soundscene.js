@@ -14,13 +14,48 @@ SoundScene.prototype = {
 
     PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST ;
 
-    this.scenehelpers.setup("Sound Example") ;
+    this.boxCtr = this.scenehelpers.setup("Sound Example") ;
 
     var sounds = [] ;
     sounds.push (this.game.assetManager.getAsset("sounds.enemy_hit")) ;
     sounds.push (this.game.assetManager.getAsset("sounds.machinegun")) ;
     sounds.push (this.game.assetManager.getAsset("sounds.blip_select")) ;
     sounds.push (this.game.assetManager.getAsset("sounds.small_explosion")) ;
+
+    var createSprite = function (x, y) {
+      // load a sprite sheet
+      var sprite = new SmokingMirror.TwoD.SpriteSheet(
+        scene.game.assetManager.getAsset("sprites.sheets.explosion"),
+        scene.game.assetManager.getAsset("sprites.textures.explosion")
+      ) ;
+
+      sprite.movieClip.anchor.set (0.5) ;
+      sprite.movieClip.position.set (x, y) ;
+      sprite.movieClip.animationSpeed = 0.5 ;
+      sprite.movieClip.alpha = 0 ;
+      sprite.movieClip.loop = false ;
+      sprite.movieClip.onComplete = function () { this.alpha = 0 ; } ;
+
+      scene.boxCtr.addChild (sprite.movieClip) ;
+
+      return sprite.movieClip ;
+    } ;
+
+    var sprites = [] ;
+    sprites.push (createSprite (50 + 109 * 0, this.scenehelpers.boxHeight / 2)) ;
+    sprites.push (createSprite (50 + 109 * 1, this.scenehelpers.boxHeight / 2)) ;
+    sprites.push (createSprite (50 + 109 * 2, this.scenehelpers.boxHeight / 2)) ;
+    sprites.push (createSprite (50 + 109 * 3, this.scenehelpers.boxHeight / 2)) ;
+
+    var mineSpr = new PIXI.Sprite(
+      new PIXI.Texture(new PIXI.BaseTexture(scene.game.assetManager.getAsset("images.mine")))
+    ) ;
+    mineSpr.anchor.set (0.5) ;
+    mineSpr.position.set (this.scenehelpers.boxWidth / 2, this.scenehelpers.boxHeight - 60) ;
+    this.boxCtr.addChild (mineSpr) ;
+    mineSpr.alpha = 0;
+
+
 
     var music = this.game.assetManager.getAsset("sounds.music") ;
     music.loop = true ;
@@ -41,8 +76,8 @@ SoundScene.prototype = {
 
     this.game.sceneSetHelpText(
       "<p>Sound manager plays sounds via the AudioContext interface.</p>" +
-      "<p>It supports global volume, both realtime and static sounds, plus simple effects such as reverb, fading, etc.<p>" +
-       "<p>1,2,3,4 plays various sound effects.</p>" +
+      "<p>It supports global volume, both realtime and static sounds, plus simple effects such as playback speed changes, reverb, fading, etc.<p>" +
+       "<p>1,2,3,4 plays various sound effects.  You can enable/disable various effects for the sound effects.</p>" +
        "<p>M will start or stop the music.  You can use F to fade the music out if it is playing.</p>"
     ) ;
 
@@ -64,23 +99,37 @@ SoundScene.prototype = {
       SmokingMirror.Sound.SoundManager.play (snd) ;
     } ;
 
+    var displaySprite = function (which) {
+      which.alpha = 1 ;
+      which.gotoAndPlay(0) ;
+    } ;
+
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_1, function () {
       sndPlay (sounds[0]) ;
+      displaySprite (sprites[0]) ;
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_2, function () {
       sndPlay (sounds[1]) ;
+      displaySprite (sprites[1]) ;
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_3, function () {
       sndPlay (sounds[2]) ;
+      displaySprite (sprites[2]) ;
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_4, function () {
       sndPlay (sounds[3]) ;
+      displaySprite (sprites[3]) ;
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_M, function () {
+      if (mineSpr.alpha === 0) {
+        mineSpr.alpha = 1 ;
+      } else {
+        mineSpr.alpha = 0 ;
+      }
       SmokingMirror.Sound.SoundManager.playMusic (music) ;
     }) ;
 

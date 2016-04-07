@@ -37,6 +37,10 @@ var smokingmirror = {
     CurveFollower: require('./3d/curvefollower'),
   },
 
+  TwoD: {
+    SpriteSheet: require ('./2d/spritesheet'),
+  },
+
   Shaders: {
     GlowFilter: require('./shaders/glowfilter')
   },

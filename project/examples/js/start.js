@@ -1,7 +1,7 @@
 /* globals SmokingMirror */
 
 var game = new SmokingMirror.Game() ;
-var defaultScene = 'Sounds' ;
+var defaultScene = 'Spritesheets' ;
 
 var assetList = {
   images: {
@@ -15,9 +15,20 @@ var assetList = {
     vpilot: 'assets/images/portrait-vpilot.png',
     trashcan: 'assets/images/trashcan-scaled.png',
     eventhorizon_glow: 'assets/images/eventhorizon_glow.png',
+    powerups_iconic: 'assets/images/powerups-iconic.png',
   },
   models: {
-    player: 'assets/objects/player3.obj'
+    player: 'assets/objects/player3.obj',
+  },
+  sprites: {
+    sheets: {
+      explosion: 'assets/sprites/explosion.json',
+      explosion2: 'assets/sprites/explosion2.json',
+    },
+    textures: {
+      explosion: 'assets/sprites/packed/explosion.png',
+      explosion2: 'assets/sprites/packed/explosion2.png',
+    }
   },
   sounds: {
     music: 'assets/sounds/musicingame.mp3',
@@ -57,6 +68,7 @@ function setupScenes() {
     { name: 'Blackhole', source: require('./scenes/blackholescene') },
     { name: 'Input Manager', source: require('./scenes/inputscene') },
     { name: 'Sounds', source: require('./scenes/soundscene') },
+    { name: 'Spritesheets', source: require('./scenes/spritesheetscene') },
   ] ;
 
   scenes.classes = {} ;

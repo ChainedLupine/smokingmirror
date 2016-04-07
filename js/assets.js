@@ -15,7 +15,7 @@ AssetManager.prototype = {
     var enumAssets = function (obj, path) {
       for (var i in obj) {
         if (typeof (obj[i]) === 'object') {
-          enumAssets (obj[i], i + '.') ;
+          enumAssets (obj[i], (path.length > 0 ? path : "") + i + '.') ;
         } else {
           toLoad.push ({ name: path + i, pathToAsset: obj[i]}) ;
         }
@@ -48,7 +48,10 @@ AssetManager.prototype = {
         console.log ('AssetManager: Loading image ' + source) ;
         var image = new Image();
         image.onload = function () { task.resolve(image); } ;
-        image.onerror = function () { task.reject(); } ;
+        image.onerror = function () {
+          throw new Error ("Unable to load(image) " + source) ;
+          //task.reject();
+        } ;
         image.src = source ;
       }).promise();
     } ;
@@ -66,7 +69,8 @@ AssetManager.prototype = {
               task.resolve (newSound) ;
             }, false, xhr) ;
           } else {
-            task.reject() ;
+            throw new Error ("Unable to load(sound) " + source) ;
+            //task.reject() ;
           }
         };
 
@@ -78,12 +82,18 @@ AssetManager.prototype = {
 
     var count = toLoad.length ;
 
+    var makeErrorHandler = function (path) {
+      return function () {
+        throw new Error ("Unable to load(get) " + path) ;
+      } ;
+    } ;
+
     while (toLoad.length > 0) {
       var itemToLoad = toLoad.shift() ;
       var loader ;
 
       if (itemToLoad.pathToAsset.match("\\.(obj|txt|json)$")) { // text
-        loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)) ;
+        loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)).fail (makeErrorHandler(itemToLoad.pathToAsset)) ;
       } if (itemToLoad.pathToAsset.match("\\.(png|jpg)$")) { // image
         loader = loadAsyncImage (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
       } if (itemToLoad.pathToAsset.match("\\.(wav|mp3)$")) { // sound

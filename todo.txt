@@ -10,15 +10,16 @@
 
 + In-game UI
 
-+ debug camera control
++ debug 3D camera control
   + lets you override scene camera and steer it around using mouse
     + pushes control scheme and generates its own
 
 + examples
-  + vector example
-  + sound example
-  + 2d Sprite system demo
+  + [done] sound example
   + [done] keyboard/mouse system
+  + [done] spritesheet example
+  + vector example
+  + 2d Sprite system demo
   + ingame UI
   + 3d mini-game
     + shooting game with top-down perspective
@@ -27,6 +28,9 @@
 
 
 --- DONE ---
+
++ [done] write spritesheet parser (since PIXI wants me to use their own built-in asset loader/cacher)
+  + [done] read in JSON, split into textures
 
 + [done] input event system
   + [done] Keyboard
