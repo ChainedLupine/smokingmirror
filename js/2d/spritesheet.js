@@ -11,7 +11,7 @@ var SpriteSheet = function (sheetJSON, sheetImage, format) {
 
   var spriteSheetTx = new PIXI.BaseTexture(sheetImage) ;
 
-  var textures = [] ;
+  this.textures = [] ;
 
   format = format ? format : SpriteSheet.FORMAT_TEXTUREPACKER ;
 
@@ -51,11 +51,11 @@ var SpriteSheet = function (sheetJSON, sheetImage, format) {
       }
 
       var frameTx = new PIXI.Texture (spriteSheetTx, frameBounds, frameBounds.clone(), frameTrim, frameDefinition.rotated) ;
-      textures.push (frameTx) ;
+      this.textures.push (frameTx) ;
     }
 
-    // now that we've generated a series of textures, turn them into a movieclip
-    this.movieClip = new PIXI.extras.MovieClip (textures) ;
+    //// now that we've generated a series of textures, turn them into a movieclip
+    //this.movieClip = new PIXI.extras.MovieClip (textures) ;
 
   } else {
     throw new Error ("This is not a sprite sheet!") ;
@@ -65,6 +65,8 @@ var SpriteSheet = function (sheetJSON, sheetImage, format) {
 SpriteSheet.FORMAT_TEXTUREPACKER = "TP" ;
 
 
-//SpriteSheet.prototype.
+SpriteSheet.prototype.destroy = function () {
+  this.textures = null ;
+} ;
 
 module.exports = SpriteSheet ;

@@ -28,15 +28,22 @@ SpriteSheetScene.prototype = {
       this.game.assetManager.getAsset("sprites.textures.explosion")
     ) ;
 
-    this.boxCtr.addChild (sheetExplosion.movieClip) ;
-    sheetExplosion.movieClip.anchor.set (0.5) ;
-    sheetExplosion.movieClip.position.set (100, this.scenehelpers.boxHeight / 2) ;
-    sheetExplosion.movieClip.animationSpeed = 0.2 ;
-    sheetExplosion.movieClip.play() ;
+    var animSpriteExplosion = new SmokingMirror.TwoD.AnimatedSprite (sheetExplosion, {
+      explode: {
+        frames: "all", // special, just use all.  Otherwise give this an array of frame indexes (where 0 = first frame)
+        speed: 10, // in FPS
+        loop: true, // by default, loops (can override)
+      }
+    }) ;
 
-    this.sheetExplosion = sheetExplosion ;
+    this.boxCtr.addChild (animSpriteExplosion) ;
+    animSpriteExplosion.anchor.set (0.5) ;
+    animSpriteExplosion.position.set (100, this.scenehelpers.boxHeight / 2) ;
+    animSpriteExplosion.play("explode") ;
 
-    var sheetExplosion2 = new SmokingMirror.TwoD.SpriteSheet(
+    this.animSpriteExplosion = animSpriteExplosion ;
+
+    /*var sheetExplosion2 = new SmokingMirror.TwoD.SpriteSheet(
       this.game.assetManager.getAsset("sprites.sheets.explosion2"),
       this.game.assetManager.getAsset("sprites.textures.explosion2")
     ) ;
@@ -47,7 +54,7 @@ SpriteSheetScene.prototype = {
     sheetExplosion2.movieClip.animationSpeed = 0.2 ;
     sheetExplosion2.movieClip.play() ;
 
-    this.sheetExplosion2 = sheetExplosion2 ;
+    this.sheetExplosion2 = sheetExplosion2 ;*/
 
   },
 
