@@ -12,13 +12,12 @@
 + AnimatedSprite
   + allow multiple animations per sprite
   + can use a spritesheet or just an array of textures
-  + get type of anim playing
-  + stopAnim/playAnim
-  + resetAnim/gotoFrame
-  + events on end of anim
+  + get name of anim playing
+  + stop/play
+  + reset/goto
+  + events on end of anim cycle
   + loop setting, per animation
-  + global speed (in frames/sec)
-  + per animation speed (if none, defaults to global speed)
+  + per animation speed
 
 + TileMap
   + loading from Tiled .tmx or json

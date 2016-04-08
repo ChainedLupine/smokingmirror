@@ -33,6 +33,7 @@ SpriteSheetScene.prototype = {
         frames: "all", // special, just use all.  Otherwise give this an array of frame indexes (where 0 = first frame)
         speed: 10, // in FPS
         loop: true, // by default, loops (can override)
+        reverse: false, // can be played backwards
       }
     }) ;
 

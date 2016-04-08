@@ -7,10 +7,12 @@ var AnimatedSprite = function (source, anims) {
 
   this.textures = null ;
 
-  if (Array.isArray (source) && source.length > 0) { // source as array of textures
+  if (Array.isArray (source) && source.length > 0 && source[0] instanceof PIXI.Texture) { // source as array of textures
     this.textures = source ;
-  } else if (typeof (source) === "object") { // must be a spritesheet
+  } else if (source instanceof SmokingMirror.TwoD.SpriteSheet) { // must be a spritesheet
     this.textures = source.textures ;
+  } else {
+    throw new Error ("AnimatedSprite: Expect either array of Textures or SpriteSheet.") ;
   }
 
   PIXI.Sprite.call(this, this.textures[0] instanceof PIXI.Texture ? this.textures[0] : this.textures[0].texture) ;
@@ -57,10 +59,19 @@ Object.defineProperties(AnimatedSprite.prototype, {
     }
   }*/
 });
+
 AnimatedSprite.prototype.update = function (dt) {
 
 } ;
 
 AnimatedSprite.prototype.destroy = function (dt) {
+
+} ;
+
+AnimatedSprite.prototype.play = function () {
+
+} ;
+
+AnimatedSprite.prototype.stop = function () {
 
 } ;
