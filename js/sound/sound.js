@@ -193,11 +193,17 @@ var SoundEngine = function () {
     masterVolume: {
       set: function (v) {
         this.masterVolumeNode.gain.value = v ;
+      },
+      get: function () {
+        return this.masterVolumeNode.gain.value ;
       }
     },
     musicVolume: {
       set: function (v) {
         this.musicVolumeNode.gain.value = v ;
+      },
+      get: function () {
+        return this.musicVolumeNode.gain.value ;
       }
     }
   }) ;
@@ -418,6 +424,10 @@ SoundEngine.prototype.makeSound = function (source, loadHandler, loadSound, xhr)
     //`pause` and `restart` methods.
     o.playing = true;
   };
+
+  o.playAsMusic = function (onEnded) {
+    this.play (true, onEnded) ;
+  } ;
 
   o.pause = function() {
     //Pause the sound if it's playing, and calculate the

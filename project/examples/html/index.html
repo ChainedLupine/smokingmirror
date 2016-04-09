@@ -35,18 +35,28 @@
 				top: 10px ;
 				right: 20px ;
 				width: 400px ;
+				background-color: rgba(0, 0, 0, 0.8) ;
+				border-radius: 20px ;
+				padding-left: 10px ;
+				padding-right: 10px ;
 			}
 
 			div#scenetext {
 				color: #fff ;
 				font: 14px 'Lucida Grande', sans-serif ;
 				margin-left: .5em ;
-				margin-right: .5em ;
+				margin-right: 30px ;
 				text-shadow: 0 0 5px #000 ;
 			}
 
 			canvas#main {
 				position: relative ;
+			}
+
+			div#closebar input[type=checkbox] {
+				padding: 0px ;
+				margin-top: 16px ;
+				float: right ;
 			}
 		</style>
 		<script src="libs/dat.gui/dat.gui.min.js"></script>
@@ -63,8 +73,9 @@
 			<canvas id="main" width="1136" height="640" style="cursor: inherit;"></canvas>
 			<div id="loader"><p>Loading...</p></div>
 
-			<div id="scenehelp"><div id="scenetext"></div></div>
 		</div>
+
+		<div id="scenehelp"><div id="closebar"><input type="checkbox" checked="true"/></div><div id="scenetext"></div></div>
 
 		<div id="debuggui"></div>
   </body>

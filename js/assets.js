@@ -65,7 +65,7 @@ AssetManager.prototype = {
         xhr.onload = function(e) {
           if (this.status === 200) {
             console.log ('AssetManager: Decoding ' + source) ;
-            var newSound = SmokingMirror.Sound.SoundManager.engine.makeSound (source, function () {
+            var newSound = SmokingMirror.Sound.makeSound (source, function () {
               task.resolve (newSound) ;
             }, false, xhr) ;
           } else {

@@ -241,17 +241,6 @@ InputManagerScene.prototype = {
     this.scenehelpers.resize() ;
   },
 
-  scaleIconContainer: function () {
-    //console.log (this.game.PIXIrenderer.width, this.game.PIXIrenderer.height) ;
-    var ratio = Math.floor (Math.min (this.game.PIXIrenderer.width / iconWidth, this.game.PIXIrenderer.height / iconHeight)) ;
-    //console.log (ratio) ;
-
-    this.iconCtr.scale.x = ratio ;
-    this.iconCtr.scale.y = ratio ;
-    this.iconCtr.x = (this.game.PIXIrenderer.width - (iconWidth * ratio)) * 0.5 ;
-    this.iconCtr.y = (this.game.PIXIrenderer.height - (iconHeight * ratio)) * 0.5 ;
-  },
-
   update: function(dt) {
     this.gridSpr.tilePosition.x += 20 * dt ;
     this.gridSpr.tilePosition.y += 10 * dt ;

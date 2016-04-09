@@ -122,8 +122,6 @@ Game.prototype = {
 
     this.PIXIrenderer.render(this.stage);
 
-    SmokingMirror.Sound.SoundManager.update(this.timeDelta) ;
-
     if (this.stats !== null) {
       this.stats.end() ;
     }

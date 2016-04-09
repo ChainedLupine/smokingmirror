@@ -12,6 +12,12 @@ SpriteSheetScene.prototype = {
 
     PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST ;
 
+    this.gridSpr = new PIXI.extras.TilingSprite(
+      new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.background2"))),
+      this.game.PIXIrenderer.width, this.game.PIXIrenderer.height) ;
+    this.gridSpr.alpha = 0.2 ;
+    this.game.stage.addChild (this.gridSpr) ;
+
     this.boxCtr = this.scenehelpers.setup("Spritesheet Example") ;
     this.game.stage.addChild (this.boxCtr) ;
 
@@ -20,9 +26,10 @@ SpriteSheetScene.prototype = {
       "<p>Sprite on left is a standard fixed-sized sprite sheet, while the sprite on the right utilizes advanced packing methods such as " +
       "rotated images and cropped frames to maximize atlas texture usage.</p>" +
       "<p>Currently, sprite sheets of TexturePacker JSON format is supported but the SpriteSheet class can be easily extended to add more.</p>" +
-      "<p>AnimatedSprites render the SpriteSheet to the PIXI canvas.  You can define any number of individual animations, and play them forward " +
+      "<p>AnimatedSprite renders the SpriteSheet to the PIXI canvas.  You can define any number of individual animations, and play them forward " +
       "or backwards.</p>" +
-      "<p>You can also perform automatic looping, with callbacks on both each cycle of an animation, or when an animation completes.</p>" +
+      "<p>You can also perform automatic looping, with callbacks on both each cycle of an animation, or when an animation completes.  Callbacks " +
+      "can be per animation or global for the entire sprite.</p>" +
       "<p>AnimatedSprites allows for stacked animations.  At any time, you can push the current animation to a stack in order to play another, " +
       "and then restore the prior animation.</p>"
     ) ;
@@ -70,20 +77,12 @@ SpriteSheetScene.prototype = {
       scene.animSpriteExplosion.play("explode") ;
     } ;
 
-    this.pushAnim = function () {
-      scene.animSpriteExplosion.push() ;
-    } ;
-    this.popAnim = function () {
-      scene.animSpriteExplosion.pop() ;
-    } ;
-
     this.sceneFolder.add (animSpriteExplosion, "speed", 0, 2).step(0.1) ;
     this.sceneFolder.add (animSpriteExplosion, "reverse").listen() ;
+    this.sceneFolder.add (animSpriteExplosion, "loop").listen() ;
     this.sceneFolder.add (this, "resetAnim") ;
     this.sceneFolder.add (this, "playAnim") ;
     this.sceneFolder.add (this, "stopAnim") ;
-    //this.sceneFolder.add (this, "pushAnim") ;
-    //this.sceneFolder.add (this, "popAnim") ;
 
     var sheetExplosion2 = new SmokingMirror.TwoD.SpriteSheet(
       this.game.assetManager.getAsset("sprites.sheets.explosion2"),
@@ -101,7 +100,7 @@ SpriteSheetScene.prototype = {
 
     this.boxCtr.addChild (animSpriteExplosion2) ;
     animSpriteExplosion2.anchor.set (0.5) ;
-    animSpriteExplosion2.position.set (this.scenehelpers.boxWidth - 100, this.scenehelpers.boxHeight / 2) ;
+    animSpriteExplosion2.position.set (this.scenehelpers.boxWidth - 200, this.scenehelpers.boxHeight / 2) ;
     animSpriteExplosion2.play("explode") ;
 
     this.animSpriteExplosion2 = animSpriteExplosion2 ;
@@ -110,6 +109,9 @@ SpriteSheetScene.prototype = {
 
   destroy: function() {
     SmokingMirror.Input.InputManager.clear() ;
+
+    this.game.stage.removeChild (this.gridSpr) ;
+    this.gridSpr = null ;
 
     this.game.stage.removeChild (this.boxCtr) ;
     this.boxCtr = null ;
@@ -128,11 +130,17 @@ SpriteSheetScene.prototype = {
   },
 
   resize: function () {
+    this.gridSpr.width = this.game.PIXIrenderer.width ;
+    this.gridSpr.height = this.game.PIXIrenderer.height ;
+
     this.scenehelpers.resize() ;
   },
 
 
   update: function(dt) {
+    this.gridSpr.tilePosition.x += 20 * dt ;
+    this.gridSpr.tilePosition.y += 10 * dt ;
+    
     this.animSpriteExplosion.update(dt) ;
     this.animSpriteExplosion2.update(dt) ;
   },

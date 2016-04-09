@@ -14,6 +14,8 @@ if (typeof dat !== "undefined" && typeof dat.GUI !== "undefined") {
   } ;
 }
 
+var SoundEngine = require('./sound/sound') ;
+
 var smokingmirror = {
   Math: require('./3d/math/misc'),
   Vector3: require('./3d/math/vector3'),
@@ -48,7 +50,7 @@ var smokingmirror = {
 
   Input: require('./input'),
 
-  Sound: require('./sound'),
+  Sound: new SoundEngine(),
 
 } ;
 

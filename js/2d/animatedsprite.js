@@ -125,10 +125,15 @@ AnimatedSprite.prototype.prepareAnimation = function (name, anim) {
 } ;
 
 AnimatedSprite.prototype.play = function (name) {
+  if (!name) {
+    name = "default" ;
+  }
+
   if (this.anims.hasOwnProperty(name)) {
     this.currAnim = this.anims[name] ;
     this.currAnimState = this.animStates[name] ;
-    this.reset() ;
+    this._texture = this.textures[this.currAnimState.currFrame] ;
+    //this.reset() ;
     this.currAnimState.playing = true ;
 
   } else {
@@ -139,7 +144,7 @@ AnimatedSprite.prototype.play = function (name) {
 AnimatedSprite.prototype.reset = function () {
   this.currAnimState.currTime = 0 ;
   this.currAnimState.currFrame = 0 ;
-  this.currAnimState.playing = false ;
+  //this.currAnimState.playing = false ;
   this.currAnimState.currFrame = this.currAnim.frames[this.currAnimState.reverse ? (this.currAnim.frames.length - 1) : 0] ;
   this._texture = this.textures[this.currAnimState.currFrame] ;
 } ;
@@ -161,11 +166,15 @@ AnimatedSprite.prototype.update = function (dt) {
         animState.playing = false ;
         if (anim.onComplete) {
           anim.onComplete () ;
+        } else {
+          if (this.onComplete) { this.onComplete () ; }
         }
         return ;
       } else {
         if (anim.onCycle) {
-          anim.onCycle () ;
+           anim.onCycle () ;
+        } else {
+          if (this.onCycle) { this.onCycle () ; }
         }
       }
     }

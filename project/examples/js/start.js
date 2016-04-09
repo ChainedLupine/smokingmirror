@@ -1,7 +1,8 @@
 /* globals SmokingMirror */
 
 var game = new SmokingMirror.Game() ;
-var defaultScene = 'Spritesheets' ;
+//var defaultScene = 'Spritesheets' ;
+var defaultScene = 'Sounds' ;
 
 var assetList = {
   images: {
@@ -15,6 +16,8 @@ var assetList = {
     vpilot: 'assets/images/portrait-vpilot.png',
     trashcan: 'assets/images/trashcan-scaled.png',
     eventhorizon_glow: 'assets/images/eventhorizon_glow.png',
+    background: 'assets/images/background.png',
+    background2: 'assets/images/background2.png',
   },
   models: {
     player: 'assets/objects/player3.obj',
@@ -45,12 +48,22 @@ var scenes = {} ;
 function loadAssetsAndStart () {
   game.assetManager.loadAssets (assetList, function() {
     $('#loader').hide() ;
+    $("div#scenehelp").show() ;
+
+    $('div#closebar input[type=checkbox]').change(function() {
+      if (this.checked) {
+        $("div#scenetext").slideDown ("fast") ;
+      } else {
+        $("div#scenetext").slideUp ("slow") ;
+      }
+    }) ;
 
     game.enableDebug (game.debugFlags.ALL) ;
     game.enableLivereload() ;
 
     var sceneName = defaultScene ;
     var scene = _.find (scenes.list, { name: sceneName }) ;
+
     game.startNewScene(new scene.source(game)) ;
     game.startLoop() ;
   }, function (loaded, max) {
@@ -106,6 +119,8 @@ function createSceneHelpers() {
 }
 
 $(document).ready (function() {
+
+  $("div#scenehelp").hide() ;
 
   game.init(1136, 640) ;
 

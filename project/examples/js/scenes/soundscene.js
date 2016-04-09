@@ -14,7 +14,14 @@ SoundScene.prototype = {
 
     PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST ;
 
+    this.gridSpr = new PIXI.extras.TilingSprite(
+      new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.background"))),
+      this.game.PIXIrenderer.width, this.game.PIXIrenderer.height) ;
+    this.gridSpr.alpha = 0.2 ;
+    this.game.stage.addChild (this.gridSpr) ;
+
     this.boxCtr = this.scenehelpers.setup("Sound Example") ;
+
 
     var sounds = [] ;
     sounds.push (this.game.assetManager.getAsset("sounds.enemy_hit")) ;
@@ -22,23 +29,25 @@ SoundScene.prototype = {
     sounds.push (this.game.assetManager.getAsset("sounds.blip_select")) ;
     sounds.push (this.game.assetManager.getAsset("sounds.small_explosion")) ;
 
+    // load a sprite sheet
+    var sheet = new SmokingMirror.TwoD.SpriteSheet(
+      scene.game.assetManager.getAsset("sprites.sheets.explosion"),
+      scene.game.assetManager.getAsset("sprites.textures.explosion")
+    ) ;
+
     var createSprite = function (x, y) {
-      // load a sprite sheet
-      var sprite = new SmokingMirror.TwoD.SpriteSheet(
-        scene.game.assetManager.getAsset("sprites.sheets.explosion"),
-        scene.game.assetManager.getAsset("sprites.textures.explosion")
-      ) ;
 
-      sprite.movieClip.anchor.set (0.5) ;
-      sprite.movieClip.position.set (x, y) ;
-      sprite.movieClip.animationSpeed = 0.5 ;
-      sprite.movieClip.alpha = 0 ;
-      sprite.movieClip.loop = false ;
-      sprite.movieClip.onComplete = function () { this.alpha = 0 ; } ;
+      var sprite = new SmokingMirror.TwoD.AnimatedSprite (sheet, {
+        frames: "all", speed: 30, loop: false
+      }) ;
+      sprite.anchor.set (0.5) ;
+      sprite.position.set (x, y) ;
+      sprite.alpha = 0 ;
+      sprite.onComplete = function () { sprite.alpha = 0 ; } ;
 
-      scene.boxCtr.addChild (sprite.movieClip) ;
+      scene.boxCtr.addChild (sprite) ;
 
-      return sprite.movieClip ;
+      return sprite ;
     } ;
 
     var sprites = [] ;
@@ -46,6 +55,7 @@ SoundScene.prototype = {
     sprites.push (createSprite (50 + 109 * 1, this.scenehelpers.boxHeight / 2)) ;
     sprites.push (createSprite (50 + 109 * 2, this.scenehelpers.boxHeight / 2)) ;
     sprites.push (createSprite (50 + 109 * 3, this.scenehelpers.boxHeight / 2)) ;
+    this.sprites = sprites ;
 
     var mineSpr = new PIXI.Sprite(
       new PIXI.Texture(new PIXI.BaseTexture(scene.game.assetManager.getAsset("images.mine")))
@@ -60,15 +70,15 @@ SoundScene.prototype = {
     var music = this.game.assetManager.getAsset("sounds.music") ;
     music.loop = true ;
 
-    SmokingMirror.Sound.SoundManager.masterVolume = 1.0 ;
+    SmokingMirror.Sound.masterVolume = 1.0 ;
 
     this.soundSpeed = 1.0 ;
     this.reverb = false ;
     this.echo = false ;
 
     this.sceneFolder = this.game.dgui.addFolder ("Sounds") ;
-    this.sceneFolder.add(SmokingMirror.Sound.SoundManager, 'masterVolume', 0.0, 1.0).step (0.1) ;
-    this.sceneFolder.add(SmokingMirror.Sound.SoundManager, 'musicVolume', 0.0, 1.0).step (0.1) ;
+    this.sceneFolder.add(SmokingMirror.Sound, 'masterVolume', 0.0, 1.0).step (0.1) ;
+    this.sceneFolder.add(SmokingMirror.Sound, 'musicVolume', 0.0, 1.0).step (0.1) ;
     this.sceneFolder.add(this, 'soundSpeed', 0.1, 2).step (0.1) ;
     this.sceneFolder.add(this, 'reverb') ;
     this.sceneFolder.add(this, 'echo') ;
@@ -96,12 +106,13 @@ SoundScene.prototype = {
         snd.clearEcho() ;
       }
 
-      SmokingMirror.Sound.SoundManager.play (snd) ;
+      snd.play() ;
     } ;
 
     var displaySprite = function (which) {
       which.alpha = 1 ;
-      which.gotoAndPlay(0) ;
+      which.goto(0) ;
+      which.play() ;
     } ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_1, function () {
@@ -130,7 +141,7 @@ SoundScene.prototype = {
       } else {
         mineSpr.alpha = 0 ;
       }
-      SmokingMirror.Sound.SoundManager.playMusic (music) ;
+      music.playAsMusic() ;
     }) ;
 
     SmokingMirror.Input.InputManager.createKeyEvent (SmokingMirror.Input.InputManager.KEY_F, function () {
@@ -145,7 +156,12 @@ SoundScene.prototype = {
   destroy: function() {
     SmokingMirror.Input.InputManager.clear() ;
 
+    this.game.stage.removeChild (this.gridSpr) ;
+    this.gridSpr = null ;
+
     this.game.dgui.removeFolder ("Sounds") ;
+
+    this.sprites = null ;
 
     this.scenehelpers.destroy() ;
 
@@ -155,11 +171,20 @@ SoundScene.prototype = {
   },
 
   resize: function () {
+    this.gridSpr.width = this.game.PIXIrenderer.width ;
+    this.gridSpr.height = this.game.PIXIrenderer.height ;
+
     this.scenehelpers.resize() ;
   },
 
 
   update: function(dt) {
+    for (var i = 0; i < this.sprites.length; i++) {
+      this.sprites[i].update(dt) ;
+    }
+
+    this.gridSpr.tilePosition.x += 20 * dt ;
+    this.gridSpr.tilePosition.y += 10 * dt ;
   },
 
   render: function() {
