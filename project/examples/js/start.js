@@ -48,13 +48,24 @@ var scenes = {} ;
 function loadAssetsAndStart () {
   game.assetManager.loadAssets (assetList, function() {
     $('#loader').hide() ;
-    $("div#scenehelp").show() ;
+    var textparent = $("div#scenehelp") ;
+    textparent.show() ;
+    var textdiv = $("div#scenetext") ;
+    //textparent.addClass ("background") ;
 
     $('div#closebar input[type=checkbox]').change(function() {
       if (this.checked) {
-        $("div#scenetext").slideDown ("fast") ;
+        textdiv.slideDown ("fast") ;
+        //textparent.addClass ("background") ;
+        textparent.animate({
+          backgroundColor: "rgba(0,0,0,0.8)"
+        }, "fast") ;
       } else {
-        $("div#scenetext").slideUp ("slow") ;
+        textdiv.slideUp ("slow") ;
+        //textparent.removeClass ("background") ;
+        textparent.animate({
+          backgroundColor: "rgba(0,0,0,0.0)"
+        }, "slow") ;
       }
     }) ;
 
