@@ -7,17 +7,7 @@
 + Basic scenegraph
   + nested groups of objects
     + supports Base3d and Base2d objects
-    + update/render calls
-
-+ AnimatedSprite
-  + allow multiple animations per sprite
-  + can use a spritesheet or just an array of textures
-  + get name of anim playing
-  + stop/play
-  + reset/goto
-  + events on end of anim cycle
-  + loop setting, per animation
-  + per animation speed
+    + automatic update/render calls (if used via scenes)
 
 + TileMap
   + loading from Tiled .tmx or json
@@ -50,6 +40,23 @@
 
 
 --- DONE ---
+
++ [done] AnimatedSprite
+  + [done] allow multiple animations per sprite
+  + [done] can use a spritesheet or just an array of textures
+  + [done] get name of anim playing
+  + [done] get frame of anim playing
+  + [done] get maximum frames in anim
+  + [done] stop
+  + [done] play
+  + [done] reset
+  + [done] goto (to certain frame)
+  + [done] event on end of anim (when stopping)
+  + [done] event on end of loop cycle
+  + [done] loop setting, per animation
+  + [done] speed (in FPS), per animation
+  + [done] push animation to stack in order to resume
+  + [done] pop animation
 
 + [done] write spritesheet parser (since PIXI wants me to use their own built-in asset loader/cacher)
   + [done] read in JSON, split into textures

@@ -15,6 +15,11 @@ var Game = function () {
   this.PIXIrenderer = null ;
   this.wireframeRender = new WireframeRender() ;
 
+  this.engineSettings = {
+    timeScale: 1.0,
+    currentScene: null,
+  } ;
+
   this.timeCurrent = null ;
   this.timeDelta = 0 ;
   this.timePrev = null ;
@@ -164,10 +169,6 @@ Game.prototype = {
   },
 
   setupDebugUI: function() {
-    var EngineSettings = function() {
-      this.timeScale = 1.0 ;
-      this.currentScene = 'N/A' ;
-    } ;
 
     /*var CameraMenu = function () {
       this.posX = 0.0 ;
@@ -189,9 +190,8 @@ Game.prototype = {
     //}
 
     //var cameraMenu = new CameraMenu() ;
-    var engineSettings = new EngineSettings() ;
 
-    gui.add(engineSettings, 'timeScale', 0, 2);
+    gui.add(this.engineSettings, 'timeScale', 0, 2);
     var game = this ;
 
 
@@ -204,7 +204,6 @@ Game.prototype = {
     camFolder.add(cameraMenu, 'rotZ', 0, 360);
 
     this.cameraMenu = cameraMenu ;*/
-    this.engineSettings = engineSettings ;
 
     //gui.close() ;
 
@@ -274,5 +273,18 @@ Game.prototype = {
   },
 
 };
+
+Object.defineProperties (Game.prototype, {
+  timeScale: {
+    get: function () { return this.engineSettings.timeScale ; },
+    set: function (v) {
+      this.engineSettings.timeScale = v ;
+    }
+  },
+  currSceneName: {
+    get: function () { return this.engineSettings.currentScene ; },
+  }
+}) ;
+
 
 module.exports = Game ;

@@ -54,9 +54,6 @@ var SpriteSheet = function (sheetJSON, sheetImage, format) {
       this.textures.push (frameTx) ;
     }
 
-    //// now that we've generated a series of textures, turn them into a movieclip
-    //this.movieClip = new PIXI.extras.MovieClip (textures) ;
-
   } else {
     throw new Error ("This is not a sprite sheet!") ;
   }

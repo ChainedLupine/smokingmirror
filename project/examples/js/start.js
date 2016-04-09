@@ -47,7 +47,7 @@ function loadAssetsAndStart () {
     $('#loader').hide() ;
 
     game.enableDebug (game.debugFlags.ALL) ;
-    //game.enableLivereload() ;
+    game.enableLivereload() ;
 
     var sceneName = defaultScene ;
     var scene = _.find (scenes.list, { name: sceneName }) ;
