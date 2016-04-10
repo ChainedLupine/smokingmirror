@@ -42,7 +42,7 @@ InputManagerScene.prototype = {
     var gridTx = new PIXI.Texture(new PIXI.BaseTexture(this.game.assetManager.getAsset("images.grid"))) ;
 
     this.gridSpr = new PIXI.extras.TilingSprite(gridTx, this.game.PIXIrenderer.width, this.game.PIXIrenderer.height) ;
-    this.gridSpr.alpha = 0.2 ;
+    this.gridSpr.alpha = 0.05 ;
     this.game.stage.addChild (this.gridSpr) ;
 
     var boxCtr = this.scenehelpers.setup("Input Example") ;
@@ -251,6 +251,7 @@ InputManagerScene.prototype = {
       drop.scale.x -= dt * 1.5 ;
       drop.scale.y -= dt * 1.5 ;
       if (drop.scale.x <= 0) {
+        this.game.stage.removeChild (drop) ;
         this.mouseDrops.splice (i, 1) ;
       }
     }

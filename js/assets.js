@@ -34,7 +34,18 @@ AssetManager.prototype = {
 
     var loadProcessor = function (itemToLoad) {
       return function (data) {
-        console.log ('AssetManager: Loaded key ' + itemToLoad.name ) ;
+        console.log ('AssetManager: Loaded key ' + itemToLoad.name + ' from ' + itemToLoad.pathToAsset + ' (' + typeof (data) + ')') ;
+        if (itemToLoad.pathToAsset.match("\\.json$")) {
+          /*
+           * Fixup.  Our test webserver is dumb and does not send things with a Content-Type in response headers.
+           *
+           * So, for JSON it just replies back with a string.  Browsers, however, will turn "application/json" into an object.
+           * This just makes sure we're all on the same page.
+           */
+           if (typeof data !== 'object') {
+             data = JSON.parse (data) ;
+           }
+        }
         cache[itemToLoad.name] = data ;
         loadCount++ ;
         if (updateCallback) {
@@ -92,7 +103,7 @@ AssetManager.prototype = {
       var itemToLoad = toLoad.shift() ;
       var loader ;
 
-      if (itemToLoad.pathToAsset.match("\\.(obj|txt|json)$")) { // text
+      if (itemToLoad.pathToAsset.match("\\.(obj|txt|json|tmx)$")) { // text
         loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)).fail (makeErrorHandler(itemToLoad.pathToAsset)) ;
       } if (itemToLoad.pathToAsset.match("\\.(png|jpg)$")) { // image
         loader = loadAsyncImage (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;

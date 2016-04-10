@@ -74,7 +74,7 @@ var Stats = function () {
 
 	var fps = 0, fpsMin = Infinity, fpsMax = 0;
 
-	var fpsDiv = createPanel( 'fps', '#eee', '#1a1a1a' );
+	var fpsDiv = createPanel( 'fps', '#2fa1d6', '#1a1a1a' );
 	var fpsText = fpsDiv.children[ 0 ];
 	var fpsGraph = fpsDiv.children[ 1 ];
 

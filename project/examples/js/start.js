@@ -19,9 +19,19 @@ var assetList = {
     background: 'assets/images/background.png',
     background2: 'assets/images/background2.png',
   },
+  
+  level: {
+    test: 'assets/levels/test.tmx',
+    tiles: {
+      sheet: 'assets/tiles/tiles.json',
+      texture: 'assets/tiles/tiles.png',
+    }
+  },
+
   models: {
     player: 'assets/objects/player3.obj',
   },
+
   sprites: {
     sheets: {
       explosion: 'assets/sprites/explosion.json',
@@ -134,6 +144,15 @@ $(document).ready (function() {
   $("div#scenehelp").hide() ;
 
   game.init(1136, 640) ;
+
+  // prevent mouse events from triggering under the UI box at capture phase
+  /*$(".dg.main").get(0).addEventListener("mousedown", function(event) {
+    event.stopPropagation() ;
+  }, false);
+
+  $(".dg.main").get(0).addEventListener("mouseup", function(event) {
+    event.stopPropagation() ;
+  }, false);*/
 
   createSceneHelpers() ;
   setupScenes() ;

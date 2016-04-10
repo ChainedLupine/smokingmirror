@@ -79,7 +79,7 @@ module.exports = function MouseEvent(button, passThrough) {
         "mouseup", mouse.handlerRelease, false
       );
     }
-    
+
     if (mouse.handlerMove) {
       window.removeEventListener(
         "mousemove", mouse.handlerMove, false

@@ -42,6 +42,7 @@ var smokingmirror = {
   TwoD: {
     SpriteSheet: require ('./2d/spritesheet'),
     AnimatedSprite: require ('./2d/animatedsprite'),
+    Tilemap: require ('./2d/tilemap'),
   },
 
   Shaders: {

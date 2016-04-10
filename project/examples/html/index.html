@@ -64,6 +64,30 @@
 				float: right ;
 			}
 
+			#stats #fps, #ms, #mb {
+				padding: 1px !important;
+			}
+
+			#stats #fps #fpsText, #ms #msText, #mb #mbText {
+				left: 1px;
+				color: #eee !important;
+				padding: 0 1px;
+			}
+
+			#stats #fps #fpsGraph, #msGraph, #mbGraph {
+				left: 1px;
+				padding: 1px;
+				margin-bottom:1px;
+				background-color: rgba(47,161,214,0.5) !important;
+			}
+
+			#stats #fps #fpsGraph span, #ms #msGraph span, #mb #mbGraph span {
+				border-bottom: 1px solid !important;
+				border-color: rgba(127,197,229,0.9) !important;
+				background-color: rgba(6,25,34,0.8) !important;
+			}
+
+
 		</style>
 		<script src="libs/dat.gui/dat.gui.min.js"></script>
 		<script src="libs/pixi/pixi.js"></script>

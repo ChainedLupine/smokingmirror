@@ -269,6 +269,7 @@ module.exports = function (grunt) {
               '**/*.png',
               '**/*.jpg',
               '**/*.json',
+              '**/*.tmx',
             ],
             dest: '../project/' + projectName + '/build/assets',
           }],
