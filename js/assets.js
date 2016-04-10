@@ -32,7 +32,7 @@ AssetManager.prototype = {
     var cache = this.assetCache ;
     var loadCount = 0 ;
 
-    var loadProcessor = function (itemToLoad) {
+    var onDataLoaded = function (itemToLoad) {
       return function (data) {
         console.log ('AssetManager: Loaded key ' + itemToLoad.name + ' from ' + itemToLoad.pathToAsset + ' (' + typeof (data) + ')') ;
         if (itemToLoad.pathToAsset.match("\\.json$")) {
@@ -51,24 +51,56 @@ AssetManager.prototype = {
         if (updateCallback) {
           updateCallback (loadCount, loaders.length) ;
         }
+
+        if (loadCount >= loaders.length) {
+          console.log ('AssetManager: All ' + loaders.length + ' items loaded') ;
+          doneCallback () ;
+        }
       };
     } ;
 
-    var loadAsyncImage = function (source) {
-      return $.Deferred (function (task) {
-        console.log ('AssetManager: Loading image ' + source) ;
+    var loadAsyncText = function (source, onFinished) {
+      return function () {
+        console.log ('AssetManager: Requesting text: ' + source) ;
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', source, true);
+
+        xhr.onload = function(e) {
+          if (this.status === 200) {
+            onFinished (xhr.response) ;
+          } else {
+            throw new Error ("Unable to load(sound) " + source) ;
+            //task.reject() ;
+          }
+        };
+
+        xhr.onerror = function() {
+          throw new Error ("Unable to load(sound) " + source) ;
+        } ;
+
+        xhr.send();
+      } ;
+    } ;
+
+
+    var loadAsyncImage = function (source, onFinished) {
+      return function () {
+        console.log ('AssetManager: Requesting image: ' + source) ;
         var image = new Image();
-        image.onload = function () { task.resolve(image); } ;
+        image.onload = function () {
+          onFinished (image) ;
+        } ;
         image.onerror = function () {
           throw new Error ("Unable to load(image) " + source) ;
           //task.reject();
         } ;
         image.src = source ;
-      }).promise();
+      } ;
     } ;
 
-    var loadAsyncSound = function (source) {
-      return $.Deferred (function (task) {
+    var loadAsyncSound = function (source, onFinished) {
+      return function () {
+        console.log ('AssetManager: Requesting sound: ' + source) ;
         var xhr = new XMLHttpRequest();
         xhr.open('GET', source, true);
         xhr.responseType = 'arraybuffer';
@@ -77,7 +109,7 @@ AssetManager.prototype = {
           if (this.status === 200) {
             console.log ('AssetManager: Decoding ' + source) ;
             var newSound = SmokingMirror.Sound.makeSound (source, function () {
-              task.resolve (newSound) ;
+              onFinished (newSound) ;
             }, false, xhr) ;
           } else {
             throw new Error ("Unable to load(sound) " + source) ;
@@ -85,10 +117,12 @@ AssetManager.prototype = {
           }
         };
 
-        xhr.onerror = function() { task.reject() ; } ;
+        xhr.onerror = function() {
+          throw new Error ("OnError for load(sound) " + source) ;
+        } ;
 
         xhr.send();
-      }).promise();
+      } ;
     } ;
 
     var count = toLoad.length ;
@@ -104,24 +138,23 @@ AssetManager.prototype = {
       var loader ;
 
       if (itemToLoad.pathToAsset.match("\\.(obj|txt|json|tmx)$")) { // text
-        loader = $.get (itemToLoad.pathToAsset, loadProcessor(itemToLoad)).fail (makeErrorHandler(itemToLoad.pathToAsset)) ;
+        loader = loadAsyncText (itemToLoad.pathToAsset, onDataLoaded(itemToLoad)) ;
       } if (itemToLoad.pathToAsset.match("\\.(png|jpg)$")) { // image
-        loader = loadAsyncImage (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
+        loader = loadAsyncImage (itemToLoad.pathToAsset, onDataLoaded(itemToLoad)) ;
       } if (itemToLoad.pathToAsset.match("\\.(wav|mp3)$")) { // sound
-        loader = loadAsyncSound (itemToLoad.pathToAsset).done(loadProcessor(itemToLoad)) ;
+        loader = loadAsyncSound (itemToLoad.pathToAsset, onDataLoaded(itemToLoad)) ;
       }
 
       loaders.push (loader) ;
     }
 
+    for (var li = 0; li < loaders.length; li++) {
+      loaders[li]() ; // trigger our loaders
+    }
+
     if (updateCallback) {
       updateCallback (0, loaders.length) ;
     }
-
-    $.when.apply ($, loaders).then (function() {
-      console.log ('AssetLoader: All ' + count + ' items loaded') ;
-      doneCallback() ;
-    }) ;
 
   },
 

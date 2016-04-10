@@ -26,22 +26,30 @@ var Game = function () {
 
   this.stats = null ;
 
+  this.onResize = null ;
+
   this.postAnimate = null ;
+
+  this.renderType = null ;
 
   this.usingDebugCamera = false ;
 
   this.currentScene = null ;
-  this.debugFlags = { ALL: 0xffff, UI: 0x1, FPS: 0x2 } ;
+  this.debugFlags = { ALL: 0xffff, DAT_GUI: 0x1, STATS_FPS: 0x2 } ;
 
 } ;
 
 Game.prototype = {
-  init: function(desiredWidth, desiredHeight) {
+  init: function(canvas, desiredWidth, desiredHeight) {
 
     var renderType = this.getParameterByName('render') ;
     if (renderType === "") {
       renderType = 'webgl' ;
     }
+
+    this.canvas = canvas ;
+
+    this.renderType = renderType ;
 
     console.log ("renderType=" + renderType) ;
 
@@ -49,11 +57,10 @@ Game.prototype = {
 
     this.setupPIXI(renderType, desiredWidth, desiredHeight) ;
 
-    this.setupDebugUI() ;
 
     var game = this ;
 
-    $( window ).resize(function() {
+    window.onresize = function() {
       game.calculateCanvasSizes (desiredWidth, desiredHeight) ;
       game.wireframeRender.setViewport (0, 0, game.canvasSettings.w, game.canvasSettings.h, 0.1, 1000) ;
       game.wireframeRender.setViewAsPerpsective (90) ;
@@ -69,7 +76,7 @@ Game.prototype = {
           game.currentScene.resize() ;
         }
       }
-    }) ;
+    } ;
 
   },
 
@@ -140,8 +147,9 @@ Game.prototype = {
     this.canvasSettings.x = (window.innerWidth / 2 - this.canvasSettings.w / 2) ;
     this.canvasSettings.y = ((window.innerHeight - 5) / 2 - this.canvasSettings.h / 2) ;
 
-    $("div#game").css({ top: this.canvasSettings.y + "px" });
-    $("canvas#main").css({ left: this.canvasSettings.x + "px" });
+    if (this.onResize) {
+      this.onResize (this.canvasSettings) ;
+    }
   },
 
   setupPIXI: function(renderType, desiredWidth, desiredHeight) {
@@ -150,12 +158,10 @@ Game.prototype = {
     this.wireframeRender.setViewport (0, 0, this.canvasSettings.w, this.canvasSettings.h, 0.1, 1000) ;
     this.wireframeRender.setViewAsPerpsective (90) ;
 
-    var canvasId = $("canvas#main").get(0) ;
-
     if (renderType === 'webgl') {
-      this.PIXIrenderer = new PIXI.WebGLRenderer ( this.canvasSettings.w, this.canvasSettings.h, { view: canvasId, backgroundColor : 0x000000} );
+      this.PIXIrenderer = new PIXI.WebGLRenderer ( this.canvasSettings.w, this.canvasSettings.h, { view: this.canvas, backgroundColor : 0x000000} );
     } else if (renderType === 'canvas') {
-      this.PIXIrenderer = new PIXI.CanvasRenderer ( this.canvasSettings.w, this.canvasSettings.h, { view: canvasId, backgroundColor : 0x000000} );
+      this.PIXIrenderer = new PIXI.CanvasRenderer ( this.canvasSettings.w, this.canvasSettings.h, { view: this.canvas, backgroundColor : 0x000000} );
     } else {
       alert ("Unknown render method.") ;
       return ;
@@ -182,10 +188,12 @@ Game.prototype = {
     gui.TEXT_CLOSED = "Close Debug" ;
     gui.TEXT_OPEN = "Open Debug" ;
 
-    //if (this.getParameterByName('debugGui') === "true") {
-    $("div#debuggui").append (gui.domElement) ;
-    $("div#debuggui").hide() ;
-    //}
+    var debugGUI = document.querySelector('div#debuggui') ;
+
+    debugGUI.appendChild (gui.domElement) ;
+
+    debugGUI.style.display = "none" ;
+    //$("div#debuggui").hide() ;
 
     //var cameraMenu = new CameraMenu() ;
 
@@ -210,16 +218,25 @@ Game.prototype = {
   },
 
   enableDebug: function (system) {
+    if (this.renderType === null) {
+      throw new Error ("Need to init() the engine, first.") ;
+    }
+
     var flags = 0 ;
     if (typeof system === "undefined") {
       flags = this.debugFlags.ALL ;
     }
 
-    if (system & this.debugFlags.UI) {
-      $("div#debuggui").show() ;
+    // requires dat.gui to be already loaded
+    if (system & this.debugFlags.DAT_GUI) {
+      this.setupDebugUI() ;
+
+      //$("div#debuggui").show() ;
+      document.querySelector('div#debuggui').style.display = "block" ;
     }
 
-    if (system & this.debugFlags.FPS) {
+    // requires Stats to be already loaded
+    if (system & this.debugFlags.STATS_FPS) {
       this.stats = new Stats() ;
       this.stats.setMode(0) ;
 
@@ -235,7 +252,11 @@ Game.prototype = {
   enableLivereload: function (port) {
     //<script src="//localhost:35729/livereload.js"></script>
     port = typeof port !== 'undefined' ? port : 35729 ;
-    $.getScript("//localhost:" + port + "/livereload.js") ;
+    //$.getScript("//localhost:" + port + "/livereload.js") ;
+    var scriptE = document.createElement('script'),
+        priorScriptE = document.getElementsByTagName('script')[0] ;
+    scriptE.src = "//localhost:" + port + "/livereload.js" ;
+    priorScriptE.parentNode.insertBefore(scriptE, priorScriptE) ;
 
   },
 

@@ -4,15 +4,6 @@
 
 + vector text
 
-+ remove dependencies in SmokingMirror
-  + incorporate Bluebird for promises
-  + assets.js
-    + switch to XHR loader and Bluebird promises
-  + game.js
-    + remove $ selectors
-    + remove dat.gui
-      + make dat.gui loadable as separate
-
 + Basic scenegraph
   + nested groups of objects
     + supports Base3d and Base2d objects
@@ -55,6 +46,15 @@
 
 
 --- DONE ---
+
+
++ [done] remove as many external dependencies in SmokingMirror
+  + [done] assets.js
+    + [done] switch to XHR loader
+  + [done] game.js
+    + [done] remove jQuery calls
+    + [done] make dat.gui optional
+    + [done] make stats.js optional
 
 + [done] AnimatedSprite
   + [done] allow multiple animations per sprite

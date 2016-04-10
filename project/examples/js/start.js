@@ -19,7 +19,7 @@ var assetList = {
     background: 'assets/images/background.png',
     background2: 'assets/images/background2.png',
   },
-  
+
   level: {
     test: 'assets/levels/test.tmx',
     tiles: {
@@ -79,7 +79,6 @@ function loadAssetsAndStart () {
       }
     }) ;
 
-    game.enableDebug (game.debugFlags.ALL) ;
     game.enableLivereload() ;
 
     var sceneName = defaultScene ;
@@ -143,7 +142,17 @@ $(document).ready (function() {
 
   $("div#scenehelp").hide() ;
 
-  game.init(1136, 640) ;
+  var canvas = $("canvas#main").get(0) ;
+
+  game.onResize = function (canvasSettings) {
+    $("div#game").css({ top: canvasSettings.y + "px" });
+    $("canvas#main").css({ left: canvasSettings.x + "px" });    
+  } ;
+
+  game.init(canvas, 1136, 640) ;
+
+  game.enableDebug (game.debugFlags.STATS_FPS) ;
+  game.enableDebug (game.debugFlags.DAT_GUI) ;
 
   // prevent mouse events from triggering under the UI box at capture phase
   /*$(".dg.main").get(0).addEventListener("mousedown", function(event) {
