@@ -289,6 +289,8 @@ module.exports = function (grunt) {
               'lodash/**/*.js',
               'lodash/**/*.map',
               'stats.js/build/**/*.js',
+              'matter.js/build/**/*.js',
+              'cannon.js/build/**/*.js',
             ],
             dest: '../project/' + projectName + '/build/libs',
           }],

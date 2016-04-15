@@ -85,7 +85,7 @@ SoundScene.prototype = {
     this.sceneFolder.open() ;
 
     this.game.sceneSetHelpText(
-      "<p>Sound manager plays sounds via the AudioContext interface.</p>" +
+      "<p>The sound engine plays sounds via the AudioContext interface.</p>" +
       "<p>It supports global volume, both realtime and static sounds, plus simple effects such as playback speed changes, reverb, fading, etc.<p>" +
        "<p>1,2,3,4 plays various sound effects.  You can enable/disable various effects for the sound effects.</p>" +
        "<p>M will start or stop the music.  You can use F to fade the music out if it is playing.</p>"

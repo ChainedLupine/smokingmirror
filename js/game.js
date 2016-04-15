@@ -2,6 +2,7 @@
 /* globals dat */
 /* globals requestAnimationFrame */
 /* globals Stats */
+/* globals Matter */
 
 
 var AssetManager = require('./assets') ;
@@ -35,8 +36,9 @@ var Game = function () {
   this.usingDebugCamera = false ;
 
   this.currentScene = null ;
-  this.debugFlags = { ALL: 0xffff, DAT_GUI: 0x1, STATS_FPS: 0x2 } ;
 
+  this.debugFlags = { ALL: 0xffff, DAT_GUI: 0x1, STATS_FPS: 0x2 } ;
+  this.physicsEngines = { MATTERJS: 1, CANNONJS: 2 } ;
 } ;
 
 Game.prototype = {
@@ -172,6 +174,22 @@ Game.prototype = {
 
   },
 
+  patchDatGUI: function() {
+    // monkeypatch for dat.gui to add removeFolder
+    if (typeof dat !== "undefined" && typeof dat.GUI !== "undefined") {
+      dat.GUI.prototype.removeFolder = function(name) {
+        var folder = this.__folders[name];
+        if (!folder) {
+          return;
+        }
+        folder.close();
+        this.__ul.removeChild(folder.domElement.parentNode);
+        delete this.__folders[name];
+        this.onResize();
+      } ;
+    }
+  },
+
   setupDebugUI: function() {
 
     /*var CameraMenu = function () {
@@ -258,6 +276,27 @@ Game.prototype = {
     scriptE.src = "//localhost:" + port + "/livereload.js" ;
     priorScriptE.parentNode.insertBefore(scriptE, priorScriptE) ;
 
+  },
+
+  enablePhysics: function (engineType) {
+
+    if (engineType === this.physicsEngines.MATTERJS) {
+      this.physics = {
+        world: Matter.World,
+        engine: Matter.Engine.create ({
+          enableSleeping: true,
+        }),
+
+      } ;
+
+    } else if (engineType === this.physicsEngines.CANNONJS) {
+    } else {
+      throw new Error ("Unknown physics engine type!") ;
+    }
+  },
+
+  disablePhysics: function () {
+    this.physics = null ;
   },
 
   getParameterByName: function (name) {

@@ -1,19 +1,30 @@
 + Physics
   + matter.js for 2d
+    + integrate into timestep
+    + Game.setPhysicsEngine = MatterJS ;
   + cannon.js for 3d
+    + integrate into timestep
+    + Game.setPhysicsEngine = CannonJS ;
+  + Game.disablePhysics to deactivate
 
-+ vector text
 
 + Basic scenegraph
   + nested groups of objects
     + supports Base3d and Base2d objects
     + automatic update/render calls (if used via scenes)
 
++ vector text
+
++ helper functions
+  + smooth damping
+
 + TileMap
   + loading from Tiled .tmx or json
   + matter.js hull integration
+  + raycasting for tiles
 
-+ In-game UI
++ Scene debugger
+  + UI for displaying what's in the SM scene
 
 + debug 3D camera control
   + lets you override scene camera and steer it around using mouse
@@ -21,6 +32,9 @@
 
 + pathfinding system
   + general *star solver for any dimensions
+
++ In-game UI
+
 
 + examples
   + [done] sound example

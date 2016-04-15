@@ -1,19 +1,5 @@
 /* globals dat */
 
-// monkeypatch for dat.gui to add removeFolder
-if (typeof dat !== "undefined" && typeof dat.GUI !== "undefined") {
-  dat.GUI.prototype.removeFolder = function(name) {
-    var folder = this.__folders[name];
-    if (!folder) {
-      return;
-    }
-    folder.close();
-    this.__ul.removeChild(folder.domElement.parentNode);
-    delete this.__folders[name];
-    this.onResize();
-  } ;
-}
-
 var SoundEngine = require('./sound/sound') ;
 
 var smokingmirror = {

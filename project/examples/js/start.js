@@ -2,7 +2,7 @@
 
 var game = new SmokingMirror.Game() ;
 //var defaultScene = 'Spritesheets' ;
-var defaultScene = 'Sounds' ;
+var defaultScene = '2D Physics' ;
 
 var assetList = {
   images: {
@@ -97,10 +97,13 @@ function setupScenes() {
     { name: '3D Model', source: require('./scenes/threedmodelscene') },
     { name: '3D Curve', source: require('./scenes/threedcurvescene') },
     { name: '3D Helpers', source: require('./scenes/threedhelperscene') },
-    { name: 'Blackhole', source: require('./scenes/blackholescene') },
+    { name: '2D/3D Blackhole', source: require('./scenes/blackholescene') },
     { name: 'Input Manager', source: require('./scenes/inputscene') },
     { name: 'Sounds', source: require('./scenes/soundscene') },
-    { name: 'Spritesheets', source: require('./scenes/spritesheetscene') },
+    { name: '2D Spritesheets', source: require('./scenes/spritesheetscene') },
+    { name: '2D Tilemap', source: require('./scenes/tilemapscene') },
+    { name: '2D Physics', source: require('./scenes/physics2dscene') },
+    { name: '3D Physics', source: require('./scenes/physics3dscene') },
   ] ;
 
   scenes.classes = {} ;
@@ -146,8 +149,10 @@ $(document).ready (function() {
 
   game.onResize = function (canvasSettings) {
     $("div#game").css({ top: canvasSettings.y + "px" });
-    $("canvas#main").css({ left: canvasSettings.x + "px" });    
+    $("canvas#main").css({ left: canvasSettings.x + "px" });
   } ;
+
+  game.patchDatGUI() ;
 
   game.init(canvas, 1136, 640) ;
 
