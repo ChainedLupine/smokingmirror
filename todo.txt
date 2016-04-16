@@ -1,17 +1,12 @@
 + Physics
-  + matter.js for 2d
-    + integrate into timestep
-    + Game.setPhysicsEngine = MatterJS ;
+  + [done] matter.js for 2d
+    + [done] integrate into timestep
+    + [done] Game.setPhysicsEngine = MatterJS ;
   + cannon.js for 3d
     + integrate into timestep
     + Game.setPhysicsEngine = CannonJS ;
-  + Game.disablePhysics to deactivate
+  + [done] Game.disablePhysics to deactivate
 
-
-+ Basic scenegraph
-  + nested groups of objects
-    + supports Base3d and Base2d objects
-    + automatic update/render calls (if used via scenes)
 
 + vector text
 
@@ -60,6 +55,11 @@
 
 
 --- DONE ---
+
++ [done] Basic scenegraph
+  + [done] nested groups of objects, called SceneGroup
+    + [done] each has a SceneObject (or another SceneGroup)
+    + [done] automatic update/render calls (if used via scenes)
 
 
 + [done] remove as many external dependencies in SmokingMirror

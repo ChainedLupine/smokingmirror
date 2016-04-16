@@ -40,6 +40,7 @@ module.exports = function (grunt) {
           PIXI: true,
           module: true,
           SmokingMirror: true,
+          Matter: true,
         },
         ignores: [],
         node: false

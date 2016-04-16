@@ -1,6 +1,7 @@
 /* globals dat */
 
 var SoundEngine = require('./sound/sound') ;
+var Scenegraph = require('./scene/scenegraph') ;
 
 var smokingmirror = {
   Math: require('./3d/math/misc'),
@@ -29,6 +30,11 @@ var smokingmirror = {
     SpriteSheet: require ('./2d/spritesheet'),
     AnimatedSprite: require ('./2d/animatedsprite'),
     Tilemap: require ('./2d/tilemap'),
+  },
+
+  SceneGraph: {
+    SceneObject: require ('./scene/sceneobject'),
+    SceneGroup: require ('./scene/scenegroup'),
   },
 
   Shaders: {

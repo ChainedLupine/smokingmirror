@@ -2,7 +2,7 @@
 
 var game = new SmokingMirror.Game() ;
 //var defaultScene = 'Spritesheets' ;
-var defaultScene = '2D Physics' ;
+var defaultScene = 'Intro' ;
 
 var assetList = {
   images: {
@@ -18,6 +18,7 @@ var assetList = {
     eventhorizon_glow: 'assets/images/eventhorizon_glow.png',
     background: 'assets/images/background.png',
     background2: 'assets/images/background2.png',
+    sm_logo: 'assets/images/sm-logo.png'
   },
 
   level: {
@@ -101,9 +102,10 @@ function setupScenes() {
     { name: 'Input Manager', source: require('./scenes/inputscene') },
     { name: 'Sounds', source: require('./scenes/soundscene') },
     { name: '2D Spritesheets', source: require('./scenes/spritesheetscene') },
-    { name: '2D Tilemap', source: require('./scenes/tilemapscene') },
+    //{ name: '2D Tilemap', source: require('./scenes/tilemapscene') },
     { name: '2D Physics', source: require('./scenes/physics2dscene') },
-    { name: '3D Physics', source: require('./scenes/physics3dscene') },
+    //{ name: '3D Physics', source: require('./scenes/physics3dscene') },
+    { name: 'Intro', source: require('./scenes/introscene') },
   ] ;
 
   scenes.classes = {} ;
@@ -156,8 +158,8 @@ $(document).ready (function() {
 
   game.init(canvas, 1136, 640) ;
 
-  game.enableDebug (game.debugFlags.STATS_FPS) ;
-  game.enableDebug (game.debugFlags.DAT_GUI) ;
+  game.enableDebug (game.DebugFlags.STATS_FPS) ;
+  game.enableDebug (game.DebugFlags.DAT_GUI) ;
 
   // prevent mouse events from triggering under the UI box at capture phase
   /*$(".dg.main").get(0).addEventListener("mousedown", function(event) {

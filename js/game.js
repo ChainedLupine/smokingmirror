@@ -16,6 +16,8 @@ var Game = function () {
   this.PIXIrenderer = null ;
   this.wireframeRender = new WireframeRender() ;
 
+  this.physicsEngineType = null ;
+
   this.engineSettings = {
     timeScale: 1.0,
     currentScene: null,
@@ -37,11 +39,14 @@ var Game = function () {
 
   this.currentScene = null ;
 
-  this.debugFlags = { ALL: 0xffff, DAT_GUI: 0x1, STATS_FPS: 0x2 } ;
-  this.physicsEngines = { MATTERJS: 1, CANNONJS: 2 } ;
 } ;
 
+
 Game.prototype = {
+  DebugFlags: { ALL: 0xffff, DAT_GUI: 0x1, STATS_FPS: 0x2 },
+
+  PhysicsEngines: { MATTERJS: 1, CANNONJS: 2 },
+
   init: function(canvas, desiredWidth, desiredHeight) {
 
     var renderType = this.getParameterByName('render') ;
@@ -123,11 +128,84 @@ Game.prototype = {
 
     this.currentScene.update(this.timeDelta) ;
 
+    var engine ;
+    var physics = this.physics ;
+
+    if (this.physicsEngineType === this.PhysicsEngines.MATTERJS) {
+      engine = this.physics.engine ;
+      var timing = engine.timing ;
+
+      timing.timeScale = this.engineSettings.timeScale ;
+
+      var event = {
+        timestamp: timing.timestamp
+      } ;
+
+      var correction = 1, delta ;
+
+      // if world has been modified, clear the render scene graph
+      if (this.physics.debugView && engine.world.isModified &&
+        engine.render &&
+        engine.render.controller &&
+        engine.render.controller.clear) {
+        engine.render.controller.clear(engine.render);
+      }
+
+      if (physics.isFixed) {
+        delta = physics.delta ;
+      } else {
+        delta = (timestamp - this.timePrev) || physics.delta ;
+
+        physics.deltaHistory.push(delta) ;
+        physics.deltaHistory = physics.deltaHistory.slice(-physics.deltaSampleSize) ;
+        delta = Math.min.apply(null, physics.deltaHistory) ;
+
+        delta = delta < physics.deltaMin ? physics.deltaMin : delta ;
+        delta = delta > physics.deltaMax ? physics.deltaMax : delta ;
+
+        correction = delta / physics.delta ;
+
+        physics.delta = delta ;
+      }
+
+      if (physics.timeScalePrev !== 0) {
+        correction *= timing.timeScale / physics.timeScalePrev;
+      }
+
+      if (timing.timeScale === 0) {
+        correction = 0 ;
+      }
+
+      physics.timeScalePrev = timing.timeScale ;
+      physics.correction = correction ;
+
+      if (timing.timeScale > 0) {
+        Matter.Engine.update(this.physics.engine, delta, correction) ;
+      }
+    }
+
     if (this.postAnimate !== null) {
       this.postAnimate(this.timeDelta) ;
     }
 
     this.currentScene.render() ;
+
+    // do physics render
+    if (this.physicsEngineType === this.PhysicsEngines.MATTERJS) {
+      // render
+      if (this.physics.debugView && engine.render && engine.render.controller) {
+        //Events.trigger(runner, 'beforeRender', event);
+        //Events.trigger(engine, 'beforeRender', event); // @deprecated
+
+        engine.render.controller.world(engine) ;
+
+        //Events.trigger(runner, 'afterRender', event);
+        //Events.trigger(engine, 'afterRender', event); // @deprecated
+      }
+
+      //Events.trigger(runner, 'afterTick', event);
+      //Events.trigger(engine, 'afterTick', event); // @deprecated
+    }
 
     this.PIXIrenderer.render(this.stage);
 
@@ -242,11 +320,11 @@ Game.prototype = {
 
     var flags = 0 ;
     if (typeof system === "undefined") {
-      flags = this.debugFlags.ALL ;
+      flags = this.DebugFlags.ALL ;
     }
 
     // requires dat.gui to be already loaded
-    if (system & this.debugFlags.DAT_GUI) {
+    if (system & this.DebugFlags.DAT_GUI) {
       this.setupDebugUI() ;
 
       //$("div#debuggui").show() ;
@@ -254,7 +332,7 @@ Game.prototype = {
     }
 
     // requires Stats to be already loaded
-    if (system & this.debugFlags.STATS_FPS) {
+    if (system & this.DebugFlags.STATS_FPS) {
       this.stats = new Stats() ;
       this.stats.setMode(0) ;
 
@@ -279,23 +357,72 @@ Game.prototype = {
   },
 
   enablePhysics: function (engineType) {
+    this.physicsEngineType = engineType ;
+    if (engineType === this.PhysicsEngines.MATTERJS) {
 
-    if (engineType === this.physicsEngines.MATTERJS) {
-      this.physics = {
+      var physics = {
         world: Matter.World,
-        engine: Matter.Engine.create ({
-          enableSleeping: true,
-        }),
-
       } ;
 
-    } else if (engineType === this.physicsEngines.CANNONJS) {
+      physics.physicsDebugCtnr = new PIXI.Container() ;
+
+      physics.engine = Matter.Engine.create ({
+        element: document.body,
+        enableSleeping: true,
+        render: {
+          width: 800,
+          height: 600,
+          options: {
+            background: 'transparent',
+            wireframeBackground: '',
+            hasBounds: false,
+            enabled: true,
+            wireframes: true,
+            showSleeping: true,
+            showDebug: false,
+            showBroadphase: false,
+            showBounds: false,
+            showVelocity: true,
+            showCollisions: true,
+            showAxes: false,
+            showPositions: true,
+            showAngleIndicator: true,
+            showIds: false,
+            showShadows: false,
+          },
+          renderer: this.PIXIrenderer,
+          container: physics.physicsDebugCtnr,
+          controller: Matter.RenderPixi,
+        },
+      }) ;
+
+      var fps = 60 ;
+      physics.delta = 1000 / fps ;
+      physics.deltaMin = 1000 / fps ;
+      physics.deltaMax = 1000 / (fps * 0.5) ;
+      physics.fps = 1000 / physics.delta ;
+      physics.timeScalePrev = 1 ;
+      physics.correction = 1 ;
+      physics.deltaHistory = [] ;
+      physics.deltaSampleSize = 10 ;
+
+      physics.isFixed = false ;
+
+      this.physics = physics ;
+
+    } else if (engineType === this.PhysicsEngines.CANNONJS) {
     } else {
       throw new Error ("Unknown physics engine type!") ;
     }
   },
 
   disablePhysics: function () {
+    if (this.physicsEngineType === this.PhysicsEngines.MATTERJS) {
+      if (this.physics.physicsDebugCtnr) {
+        this.stage.removeChild (this.physics.physicsDebugCtnr) ;
+      }
+    }
+    this.physicsEngineType = null ;
     this.physics = null ;
   },
 
