@@ -218,6 +218,15 @@ InputManagerScene.prototype = {
   },
 
   destroy: function() {
+    // remove all drops
+    for (var i = this.mouseDrops.length - 1; i >= 0; i--) {
+      var drop = this.mouseDrops[i] ;
+      this.game.stage.removeChild (drop) ;
+      this.mouseDrops.splice (i, 1) ;
+    }
+
+    this.mouseDrops = null ;
+
     SmokingMirror.Input.InputManager.clear() ;
 
     this.scenehelpers.destroy() ;

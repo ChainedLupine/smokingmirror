@@ -68,6 +68,7 @@ SoundScene.prototype = {
 
 
     var music = this.game.assetManager.getAsset("sounds.music") ;
+    this.music = music ;
     music.loop = true ;
 
     SmokingMirror.Sound.masterVolume = 1.0 ;
@@ -155,6 +156,9 @@ SoundScene.prototype = {
 
   destroy: function() {
     SmokingMirror.Input.InputManager.clear() ;
+
+    this.music.pause() ;
+    this.music = null ;
 
     this.game.stage.removeChild (this.gridSpr) ;
     this.gridSpr = null ;

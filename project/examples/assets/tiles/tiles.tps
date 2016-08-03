@@ -38,7 +38,7 @@
         <key>dataFormat</key>
         <string>json</string>
         <key>textureFileName</key>
-        <filename>tiles.png</filename>
+        <filename></filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -90,7 +90,7 @@
             <key>width</key>
             <int>512</int>
             <key>height</key>
-            <int>512</int>
+            <int>2048</int>
         </QSize>
         <key>fixedTextureSize</key>
         <QSize>
@@ -108,9 +108,9 @@
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
-            <enum type="AlgorithmSettings::SizeConstraints">AnySize</enum>
+            <enum type="AlgorithmSettings::SizeConstraints">POT</enum>
             <key>forceSquared</key>
-            <true/>
+            <false/>
             <key>forceWordAligned</key>
             <false/>
             <key>maxRects</key>
@@ -147,7 +147,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>tiles.json</filename>
+                <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sheets/tiles.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -176,11 +176,11 @@
             <key>scaleMode</key>
             <enum type="ScaleMode">Smooth</enum>
             <key>extrude</key>
-            <uint>1</uint>
+            <uint>4</uint>
             <key>trimThreshold</key>
             <uint>1</uint>
             <key>trimMargin</key>
-            <uint>1</uint>
+            <uint>0</uint>
             <key>trimMode</key>
             <enum type="SpriteSettings::TrimMode">Trim</enum>
             <key>tracerTolerance</key>
@@ -194,32 +194,15 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">images/tiles_background_clear.png</key>
-            <key type="filename">images/tiles_background_detail1.png</key>
-            <key type="filename">images/tiles_background_detail2.png</key>
-            <key type="filename">images/tiles_background_detail3.png</key>
-            <key type="filename">images/tiles_background_detail4.png</key>
-            <key type="filename">images/tiles_background_nodetail.png</key>
-            <key type="filename">images/tiles_cloud.png</key>
-            <key type="filename">images/tiles_column_bottom.png</key>
-            <key type="filename">images/tiles_column_mid.png</key>
-            <key type="filename">images/tiles_column_top.png</key>
-            <key type="filename">images/tiles_grass1.png</key>
-            <key type="filename">images/tiles_grass2.png</key>
-            <key type="filename">images/tiles_grass3.png</key>
-            <key type="filename">images/tiles_grass4.png</key>
-            <key type="filename">images/tiles_rock1.png</key>
-            <key type="filename">images/tiles_rock2.png</key>
-            <key type="filename">images/tiles_rock3.png</key>
-            <key type="filename">images/tiles_rock4.png</key>
-            <key type="filename">images/tiles_sky.png</key>
-            <key type="filename">images/tiles_soil1.png</key>
-            <key type="filename">images/tiles_soil2.png</key>
-            <key type="filename">images/tiles_soil3.png</key>
-            <key type="filename">images/tiles_soil4.png</key>
-            <key type="filename">images/tiles_tree.png</key>
-            <key type="filename">images/tiles_underground.png</key>
-            <key type="filename">images/tiles_wall.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_01.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_02.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_03.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_04.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_05.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_06.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_09.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_10.png</key>
+            <key type="filename">../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_11.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -227,32 +210,15 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>images/tiles_background_clear.png</filename>
-            <filename>images/tiles_background_detail1.png</filename>
-            <filename>images/tiles_background_detail2.png</filename>
-            <filename>images/tiles_background_detail3.png</filename>
-            <filename>images/tiles_background_detail4.png</filename>
-            <filename>images/tiles_background_nodetail.png</filename>
-            <filename>images/tiles_cloud.png</filename>
-            <filename>images/tiles_column_bottom.png</filename>
-            <filename>images/tiles_column_mid.png</filename>
-            <filename>images/tiles_column_top.png</filename>
-            <filename>images/tiles_grass1.png</filename>
-            <filename>images/tiles_grass2.png</filename>
-            <filename>images/tiles_grass3.png</filename>
-            <filename>images/tiles_grass4.png</filename>
-            <filename>images/tiles_rock1.png</filename>
-            <filename>images/tiles_rock2.png</filename>
-            <filename>images/tiles_rock3.png</filename>
-            <filename>images/tiles_rock4.png</filename>
-            <filename>images/tiles_sky.png</filename>
-            <filename>images/tiles_soil1.png</filename>
-            <filename>images/tiles_soil2.png</filename>
-            <filename>images/tiles_soil3.png</filename>
-            <filename>images/tiles_soil4.png</filename>
-            <filename>images/tiles_tree.png</filename>
-            <filename>images/tiles_underground.png</filename>
-            <filename>images/tiles_wall.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_01.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_02.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_03.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_04.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_05.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_06.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_09.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_10.png</filename>
+            <filename>../../../../../ludumdare/ld35/project/fracteria/assets/sprites/images/tiles_11.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

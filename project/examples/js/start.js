@@ -98,7 +98,7 @@ function setupScenes() {
     { name: '3D Model', source: require('./scenes/threedmodelscene') },
     { name: '3D Curve', source: require('./scenes/threedcurvescene') },
     { name: '3D Helpers', source: require('./scenes/threedhelperscene') },
-    { name: '2D/3D Blackhole', source: require('./scenes/blackholescene') },
+    { name: '2D/3D Mixing', source: require('./scenes/blackholescene') },
     { name: 'Input Manager', source: require('./scenes/inputscene') },
     { name: 'Sounds', source: require('./scenes/soundscene') },
     { name: '2D Spritesheets', source: require('./scenes/spritesheetscene') },
