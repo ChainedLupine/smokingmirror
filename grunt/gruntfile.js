@@ -131,6 +131,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-typescript');
+  grunt.loadNpmTasks('grunt-tslint');
 
   grunt.task.renameTask('clean', 'base_clean') ;
   grunt.task.renameTask('watch', 'base_watch') ;

@@ -3,8 +3,13 @@
   "description": "Builds Slepinhyr and packages it up for web distribution.",
   "version": "0.99.0",
   "author": "ChainedLupine",
-  "devDependencies": {},
+  "devDependencies": {
+  },
   "dependencies": {
+    "grunt-tslint": "^3.1.1",
+    "grunt-typescript": "^0.8.0",
+    "tslint": "^3.14.0",
+    "typescript": "^1.8.10",
     "browserify": "^13.0.0",
     "grunt": "~0.4.2",
     "grunt-browserify": "^4.0.1",
