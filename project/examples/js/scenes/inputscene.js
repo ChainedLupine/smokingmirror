@@ -21,14 +21,10 @@ InputManagerScene.prototype = {
     var textStyle = {
         font : "12px 'Lucida Grande'",
         fill : '#fff',
-        //stroke : '#4a1850',
-        //strokeThickness : 5,
         dropShadow : true,
         dropShadowColor : '#000000',
         dropShadowAngle : Math.PI / 6,
         dropShadowDistance : 0,
-        //wordWrap : true,
-        //wordWrapWidth : 440
     };
 
     this.mouseText = new PIXI.Text('Mouse X, Y', textStyle) ;
@@ -134,6 +130,7 @@ InputManagerScene.prototype = {
     }) ;
 
     SmokingMirror.Input.InputManager.end () ;
+
     SmokingMirror.Input.InputManager.enable() ;
 
     var pushButton, popButton ;
@@ -264,16 +261,7 @@ InputManagerScene.prototype = {
         this.mouseDrops.splice (i, 1) ;
       }
     }
-
-
   },
-
-  render: function() {
-    //this.modelGraphics.clear() ;
-
-    //this.modelGraphics.lineStyle (4, 0xFF00FF, 1) ;
-
-  }
 
 };
 
