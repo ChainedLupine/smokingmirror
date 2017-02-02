@@ -1,3 +1,8 @@
+Convert to ES6.
+  Problems:
+    * All modules in one file?  Possible?
+    * Use Box2d instead of matter.js: https://github.com/kripken/box2d.js/
+    
 + Physics
   + [done] matter.js for 2d
     + [done] integrate into timestep
